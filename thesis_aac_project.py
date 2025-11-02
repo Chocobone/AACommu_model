@@ -2,7 +2,6 @@ import torch
 import pandas as pd
 import re
 from datasets import Dataset, DatasetDict
-from sklearn.model_selection import train_test_split
 from transformers import (
     AutoTokenizer,
     GPT2LMHeadModel,
@@ -12,14 +11,18 @@ from transformers import (
 )
 import warnings
 import json
+import tarfile
+import os
 
 warnings.filterwarnings("ignore")
 print("라이브러리 로드 완료!")
 
 # --- 1. 사전 학습된 모델 및 토크나이저 선정 ---
 MODEL_NAME = "skt/kogpt2-base-v2"
-TRAINING_FILE = "finetuning_dataset.json" 
-FINAL_MODEL_PATH = "./thesis_aac_model"
+# 🚨 수정: AI Hub 원본 데이터 파일명 사용
+TRAINING_FILE = "/data/datasets/training_71529.tar"
+VALIDATION_FILE = "/data/datasets/validation_71529.tar"
+FINAL_MODEL_PATH = "/data/yho7374/repos/AACommu_model/thesis_aac_model"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 special_tokens = {'bos_token': '<bos>', 'eos_token': '<eos>', 'pad_token': '<pad>', 'sep_token': '<sep>'}
@@ -30,29 +33,83 @@ model.resize_token_embeddings(len(tokenizer))
 
 print("Chapter 1: 모델 및 토크나이저 준비 완료!")
 
-# --- 2. 학습 데이터셋 로드 ---
-try:
-    with open(TRAINING_FILE, 'r', encoding='utf-8') as f:
-        training_data = json.load(f)
-    print(f"Chapter 2: '{TRAINING_FILE}'에서 {len(training_data)}개의 학습 데이터 로드 완료!")
-except FileNotFoundError:
-    print(f"Error: '{TRAINING_FILE}'을 찾을 수 없습니다.")
-    print("'advanced_data_augmentation.py'를 먼저 실행하여 학습 데이터셋을 생성해주세요.")
-    exit() 
-except json.JSONDecodeError:
-    print(f"Error: '{TRAINING_FILE}'의 JSON 형식이 올바르지 않습니다. 스크립트를 다시 실행해주세요.")
-    exit()
+# --- 2. 데이터 로딩 함수 (TAR 파일 처리) ---
+def load_tar_data(tar_path):
+    """
+    TAR 파일 내의 특정 경로(/02.라벨링데이터/)에서 모든 JSON 파일을 읽어 통합합니다.
+    """
+    all_data = []
+    inner_data_path = "02.라벨링데이터/" # ZIP 파일 내부 구조에 맞게 설정 (ls 결과 참고)
+    
+    try:
+        with tarfile.open(tar_path, 'r') as tar:
+            print(f"   TAR 파일 '{tar_path}'를 엽니다...")
+            
+            # tar 파일 내부의 모든 멤버를 순회
+            for member in tar.getmembers():
+                # .json 파일이면서, /02.라벨링데이터/ 경로에 있는 파일만 처리
+                if member.name.endswith('.json') and inner_data_path in member.name:
+                    f = tar.extractfile(member)
+                    if f:
+                        data = f.read().decode('utf-8')
+                        # JSON 파일은 보통 하나의 큰 객체 또는 리스트를 포함합니다.
+                        # 여기서는 파일을 통째로 읽어 리스트에 추가합니다.
+                        # (AI Hub 데이터 구조에 따라 이 부분을 조정해야 할 수 있습니다.)
+                        json_data = json.loads(data)
+                        
+                        # 파일 구조가 [{}, {}, ...] 형태일 경우:
+                        if isinstance(json_data, list):
+                            all_data.extend(json_data)
+                        # 파일 구조가 {} 형태일 경우:
+                        else:
+                            all_data.append(json_data)
 
-df = pd.DataFrame(training_data)
+                        print(f"      [LOAD] {member.name} 로드 완료.")
+        
+        return all_data
+    
+    except FileNotFoundError:
+        print(f"Error: '{tar_path}' 파일을 찾을 수 없습니다. 경로를 확인해주세요.")
+        exit()
+    except Exception as e:
+        print(f"Error processing {tar_path}: {e}")
+        exit()
 
-# --- 3. 데이터셋 전처리 및 분리 ---
-train_df, eval_df = train_test_split(df, test_size=0.1, random_state=42)
+# --- 2. 학습 데이터셋 로드 및 통합 ---
+print(f"Chapter 2: '{TRAINING_FILE}' 및 '{VALIDATION_FILE}'에서 학습 데이터 로드 시작!")
+
+# 학습 데이터 로드
+training_data = load_tar_data(TRAINING_FILE)
+print(f"총 {len(training_data)}개의 학습 데이터 레코드를 로드했습니다.")
+train_df = pd.DataFrame(training_data)
+
+# 검증 데이터 로드
+validation_data = load_tar_data(VALIDATION_FILE)
+print(f"총 {len(validation_data)}개의 검증 데이터 레코드를 로드했습니다.")
+eval_df = pd.DataFrame(validation_data)
+
+# 🚨 중요: 라벨링 데이터의 필드 확인 및 맞춤 (가정된 구조에 대한 경고)
+# AI Hub 원본 데이터는 일반적으로 ['input', 'output'] 필드를 가지고 있지 않습니다.
+# 원본 데이터의 실제 필드명 (예: 'dialogue', 'response')을 확인하고 
+# 아래 코드를 수정해야 합니다. 
+# 여기서는 데이터 증강 스크립트의 형식인 'input'과 'output' 필드를 임시로 가정합니다.
+if 'input' not in train_df.columns or 'output' not in train_df.columns:
+    print("\n⚠️ 경고: 로드된 데이터프레임에 'input' 또는 'output' 필드가 없습니다.")
+    print("      원본 JSON 파일 구조를 확인하여 'preprocess_function' 및 'df' 생성 부분을 수정해야 합니다.")
+    print(f"      현재 데이터프레임의 컬럼: {train_df.columns.tolist()}")
+    # 예시: 만약 'source_text'와 'target_text'라면:
+    # train_df = train_df.rename(columns={'source_text': 'input', 'target_text': 'output'})
+    # eval_df = eval_df.rename(columns={'source_text': 'input', 'target_text': 'output'})
+    
 raw_datasets = DatasetDict({
     'train': Dataset.from_pandas(train_df),
     'eval': Dataset.from_pandas(eval_df)
 })
 
+# --- 3. 데이터셋 전처리 및 분리 ---
+
 def preprocess_function(examples):
+    # 'input'과 'output' 필드를 연결하여 모델의 입력 시퀀스를 생성
     full_texts = [inp + out for inp, out in zip(examples['input'], examples['output'])]
     return tokenizer(full_texts, padding="max_length", truncation=True, max_length=128)
 
@@ -63,7 +120,7 @@ tokenized_datasets = raw_datasets.map(
 )
 print("Chapter 3: 데이터셋 전처리 및 분리 완료!")
 
-# --- 4. 모델 파인튜닝 ---
+# --- 4. 모델 파인튜닝 (이하 동일) ---
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 print(f"Using device: {device}")
@@ -83,7 +140,7 @@ training_args = TrainingArguments(
     greater_is_better=False,
     logging_dir='./logs',
     logging_steps=100, 
-    save_total_limit=2, # 디스크 공간 확보
+    save_total_limit=2, 
 )
 
 trainer = Trainer(
@@ -110,12 +167,9 @@ inference_model = GPT2LMHeadModel.from_pretrained(FINAL_MODEL_PATH)
 inference_model.to(device)
 inference_model.eval()
 
-# [버그 수정 Point 3] 
 # '무형문화재' 같은 문맥과 전혀 상관없는 단어 생성을 억제하기 위한 ID 리스트
-# (실제로는 더 많은 단어를 추가해야 함)
 bad_words = ["문화재", "유형", "무형", "국보", "보물", "아파요", "병원"] 
 bad_words_ids = [inference_tokenizer.encode(bad_word, add_special_tokens=False) for bad_word in bad_words]
-# 1D 리스트로 평탄화
 bad_words_ids = [item for sublist in bad_words_ids for item in sublist]
 
 
@@ -127,14 +181,13 @@ def generate_next_chunk(context, input_text, current_sentence):
     generation_params = {
         "max_length": input_ids_len + 30,
         "num_beams": 5,
-        "repetition_penalty": 2.5, # [수정] 반복 억제 강도를 2.5로 높임
+        "repetition_penalty": 2.5, 
         "early_stopping": True,
         "eos_token_id": inference_tokenizer.eos_token_id,
         "pad_token_id": inference_tokenizer.pad_token_id,
-        "no_repeat_ngram_size": 2, # [추가] 2-gram 반복을 원천 차단 (예: "주세요 주세요" 방지)
+        "no_repeat_ngram_size": 2, 
     }
     
-    # '카페' 상황일 때, '병원' 관련 단어 생성 억제
     if context == "카페":
         generation_params["bad_words_ids"] = bad_words_ids
 
