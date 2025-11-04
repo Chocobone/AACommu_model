@@ -1,0 +1,2502 @@
+[
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "더 필요한 거 있으세요?",
+        "output_text": "아니요 <sep> 괜찮아요/필요 없어요"
+    },
+    {
+        "context": "카페",
+        "input_text": "안녕하세요, 주문 도와드릴까요?",
+        "output_text": "아이스/따뜻한 <sep> 아메리카노/카페라떼/바닐라라떼 <sep> 주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "시럽 넣어드릴까요?",
+        "output_text": "네/아니요 <sep> 괜찮아요"
+    },
+    {
+        "context": "카페",
+        "input_text": "음료는 금방 나올 예정이에요.",
+        "output_text": "네 <sep> 감사합니다"
+    },
+    {
+        "context": "카페",
+        "input_text": "진동벨 번호 확인 부탁드려요.",
+        "output_text": "네 <sep> 여기요"
+    },
+    {
+        "context": "카페",
+        "input_text": "드시고 가세요? 아니면 포장이세요?",
+        "output_text": "먹고 갈게요/포장해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "오늘의 커피 추천드릴까요?",
+        "output_text": "좋아요/괜찮아요 <sep> 어떤 메뉴예요?"
+    },
+    {
+        "context": "카페",
+        "input_text": "주문하신 음료 나왔습니다.",
+        "output_text": "네 <sep> 감사합니다/잘 마실게요"
+    },
+    {
+        "context": "카페",
+        "input_text": "포인트 적립이나 할인카드 있으신가요?",
+        "output_text": "아니요 <sep> 없어요/있어요 <sep> 적립해주세요"
+    },
+    {
+        "context": "카페",
+        "input_text": "결제는 어떻게 도와드릴까요?",
+        "output_text": "카드로/현금으로/카카오페이로 <sep> 할게요"
+    }
+]
