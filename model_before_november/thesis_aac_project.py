@@ -11,7 +11,7 @@ from transformers import (
 )
 import warnings
 import json
-import tarfile
+import zipfile # <-- zipfile 모듈 추가
 import os
 
 warnings.filterwarnings("ignore")
@@ -19,9 +19,9 @@ print("라이브러리 로드 완료!")
 
 # --- 1. 사전 학습된 모델 및 토크나이저 선정 ---
 MODEL_NAME = "skt/kogpt2-base-v2"
-# 🚨 수정: AI Hub 원본 데이터 파일명 사용
-TRAINING_FILE = "/data/datasets/training_71529.tar"
-VALIDATION_FILE = "/data/datasets/validation_71529.tar"
+# 🚨 수정: ZIP 파일들이 있는 디렉토리 경로로 변경
+TRAINING_DIR = "/local_datasets/AACommu/Training/02.라벨링데이터/"
+VALIDATION_DIR = "/local_datasets/AACommu/Validation/02.라벨링데이터/" # 검증 데이터 경로도 유사할 것으로 가정
 FINAL_MODEL_PATH = "/data/yho7374/repos/AACommu_model/thesis_aac_model"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -33,73 +33,68 @@ model.resize_token_embeddings(len(tokenizer))
 
 print("Chapter 1: 모델 및 토크나이저 준비 완료!")
 
-# --- 2. 데이터 로딩 함수 (TAR 파일 처리) ---
-def load_tar_data(tar_path):
+# --- 2. 데이터 로딩 함수 (ZIP 파일 처리로 변경) ---
+def load_data_from_zip_dir(data_dir):
     """
-    TAR 파일 내의 특정 경로(/02.라벨링데이터/)에서 모든 JSON 파일을 읽어 통합합니다.
+    지정된 디렉토리 내의 모든 ZIP 파일을 열어, 그 안에 있는 모든 JSON 파일을 읽어 통합합니다.
     """
     all_data = []
-    inner_data_path = "02.라벨링데이터/" # ZIP 파일 내부 구조에 맞게 설정 (ls 결과 참고)
     
     try:
-        with tarfile.open(tar_path, 'r') as tar:
-            print(f"   TAR 파일 '{tar_path}'를 엽니다...")
-            
-            # tar 파일 내부의 모든 멤버를 순회
-            for member in tar.getmembers():
-                # .json 파일이면서, /02.라벨링데이터/ 경로에 있는 파일만 처리
-                if member.name.endswith('.json') and inner_data_path in member.name:
-                    f = tar.extractfile(member)
-                    if f:
-                        data = f.read().decode('utf-8')
-                        # JSON 파일은 보통 하나의 큰 객체 또는 리스트를 포함합니다.
-                        # 여기서는 파일을 통째로 읽어 리스트에 추가합니다.
-                        # (AI Hub 데이터 구조에 따라 이 부분을 조정해야 할 수 있습니다.)
-                        json_data = json.loads(data)
-                        
-                        # 파일 구조가 [{}, {}, ...] 형태일 경우:
-                        if isinstance(json_data, list):
-                            all_data.extend(json_data)
-                        # 파일 구조가 {} 형태일 경우:
-                        else:
-                            all_data.append(json_data)
+        # 디렉토리 내 모든 파일 순회
+        for filename in os.listdir(data_dir):
+            if filename.endswith('.zip'):
+                zip_path = os.path.join(data_dir, filename)
+                print(f"   ZIP 파일 '{filename}'을 엽니다...")
+                
+                with zipfile.ZipFile(zip_path, 'r') as zf:
+                    # ZIP 파일 내부의 모든 멤버를 순회
+                    for member_name in zf.namelist():
+                        # .json 파일만 처리
+                        if member_name.endswith('.json'):
+                            # zf.open()을 사용하여 파일 객체를 얻고 바로 읽습니다.
+                            with zf.open(member_name) as f:
+                                data = f.read().decode('utf-8-sig')
+                                
+                                # JSON 로딩 및 통합
+                                json_data = json.loads(data)
+                                
+                                if isinstance(json_data, list):
+                                    all_data.extend(json_data)
+                                else:
+                                    all_data.append(json_data)
 
-                        print(f"      [LOAD] {member.name} 로드 완료.")
+                                print(f"      [LOAD] {member_name} 로드 완료.")
         
         return all_data
     
     except FileNotFoundError:
-        print(f"Error: '{tar_path}' 파일을 찾을 수 없습니다. 경로를 확인해주세요.")
+        print(f"Error: '{data_dir}' 디렉토리를 찾을 수 없습니다. 경로를 확인해주세요.")
         exit()
     except Exception as e:
-        print(f"Error processing {tar_path}: {e}")
+        print(f"Error processing data in {data_dir}: {e}")
         exit()
 
 # --- 2. 학습 데이터셋 로드 및 통합 ---
-print(f"Chapter 2: '{TRAINING_FILE}' 및 '{VALIDATION_FILE}'에서 학습 데이터 로드 시작!")
+print(f"Chapter 2: '{TRAINING_DIR}' 및 '{VALIDATION_DIR}'에서 학습 데이터 로드 시작!")
 
 # 학습 데이터 로드
-training_data = load_tar_data(TRAINING_FILE)
+training_data = load_data_from_zip_dir(TRAINING_DIR)
 print(f"총 {len(training_data)}개의 학습 데이터 레코드를 로드했습니다.")
 train_df = pd.DataFrame(training_data)
 
 # 검증 데이터 로드
-validation_data = load_tar_data(VALIDATION_FILE)
+validation_data = load_data_from_zip_dir(VALIDATION_DIR)
 print(f"총 {len(validation_data)}개의 검증 데이터 레코드를 로드했습니다.")
 eval_df = pd.DataFrame(validation_data)
 
-# 🚨 중요: 라벨링 데이터의 필드 확인 및 맞춤 (가정된 구조에 대한 경고)
-# AI Hub 원본 데이터는 일반적으로 ['input', 'output'] 필드를 가지고 있지 않습니다.
-# 원본 데이터의 실제 필드명 (예: 'dialogue', 'response')을 확인하고 
-# 아래 코드를 수정해야 합니다. 
-# 여기서는 데이터 증강 스크립트의 형식인 'input'과 'output' 필드를 임시로 가정합니다.
+# 🚨 중요: 라벨링 데이터의 필드 확인 및 맞춤 (이하 동일)
+# ... (이하 코드는 원본과 동일)
+
 if 'input' not in train_df.columns or 'output' not in train_df.columns:
     print("\n⚠️ 경고: 로드된 데이터프레임에 'input' 또는 'output' 필드가 없습니다.")
     print("      원본 JSON 파일 구조를 확인하여 'preprocess_function' 및 'df' 생성 부분을 수정해야 합니다.")
     print(f"      현재 데이터프레임의 컬럼: {train_df.columns.tolist()}")
-    # 예시: 만약 'source_text'와 'target_text'라면:
-    # train_df = train_df.rename(columns={'source_text': 'input', 'target_text': 'output'})
-    # eval_df = eval_df.rename(columns={'source_text': 'input', 'target_text': 'output'})
     
 raw_datasets = DatasetDict({
     'train': Dataset.from_pandas(train_df),
