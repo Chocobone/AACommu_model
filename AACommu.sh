@@ -14,6 +14,6 @@
 source ~/.bashrc
 conda activate training
 
-python thesis_aac_project.py
+python pretrain_and_training.ipynb 
 
 exit 0
