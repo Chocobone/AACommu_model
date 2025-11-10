@@ -14,6 +14,6 @@
 source ~/.bashrc
 conda activate training
 
-python pretrain_and_training.ipynb 
+jupyter execute pretrain_and_training.ipynb 
 
 exit 0
