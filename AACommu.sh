@@ -14,6 +14,6 @@
 source ~/.bashrc
 conda activate training
 
-jupyter execute pretrain_and_training.ipynb 
+jupyter execute AAC_model.ipynb 
 
 exit 0
