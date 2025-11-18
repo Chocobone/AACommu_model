@@ -1,0 +1,18 @@
+no change     /data/yho7374/anaconda3/condabin/conda
+no change     /data/yho7374/anaconda3/bin/conda
+no change     /data/yho7374/anaconda3/bin/conda-env
+no change     /data/yho7374/anaconda3/bin/activate
+no change     /data/yho7374/anaconda3/bin/deactivate
+no change     /data/yho7374/anaconda3/etc/profile.d/conda.sh
+no change     /data/yho7374/anaconda3/etc/fish/conf.d/conda.fish
+no change     /data/yho7374/anaconda3/shell/condabin/Conda.psm1
+no change     /data/yho7374/anaconda3/shell/condabin/conda-hook.ps1
+no change     /data/yho7374/anaconda3/lib/python3.13/site-packages/xontrib/conda.xsh
+no change     /data/yho7374/anaconda3/etc/profile.d/conda.csh
+no change     /home/yho7374/.bashrc
+No action taken.
+
+CondaError: Run 'conda init' before 'conda activate'
+
+/var/spool/slurm/d/job59366/slurm_script: line 17: python: command not found
+/var/spool/slurm/d/job59366/slurm_script: line 19: python: command not found

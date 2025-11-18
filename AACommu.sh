@@ -12,8 +12,10 @@
 
 /data/yho7374/anaconda3/bin/conda init
 source ~/.bashrc
-conda activate AACommu
+conda activate training
 
-jupyter nbconvert --to notebook --execute AAC_model.ipynb 
+python --version
+
+python AAC_model_with_aihub.py 
 
 exit 0

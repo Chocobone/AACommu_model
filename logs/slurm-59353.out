@@ -1,0 +1,24 @@
+no change     /data/yho7374/anaconda3/condabin/conda
+no change     /data/yho7374/anaconda3/bin/conda
+no change     /data/yho7374/anaconda3/bin/conda-env
+no change     /data/yho7374/anaconda3/bin/activate
+no change     /data/yho7374/anaconda3/bin/deactivate
+no change     /data/yho7374/anaconda3/etc/profile.d/conda.sh
+no change     /data/yho7374/anaconda3/etc/fish/conf.d/conda.fish
+no change     /data/yho7374/anaconda3/shell/condabin/Conda.psm1
+no change     /data/yho7374/anaconda3/shell/condabin/conda-hook.ps1
+no change     /data/yho7374/anaconda3/lib/python3.13/site-packages/xontrib/conda.xsh
+no change     /data/yho7374/anaconda3/etc/profile.d/conda.csh
+no change     /home/yho7374/.bashrc
+No action taken.
+
+CondaError: Run 'conda init' before 'conda activate'
+
+Traceback (most recent call last):
+  File "/usr/bin/jupyter", line 11, in <module>
+    load_entry_point('jupyter-core==4.6.3', 'console_scripts', 'jupyter')()
+  File "/usr/lib/python3/dist-packages/jupyter_core/command.py", line 247, in main
+    command = _jupyter_abspath(subcommand)
+  File "/usr/lib/python3/dist-packages/jupyter_core/command.py", line 133, in _jupyter_abspath
+    raise Exception(
+Exception: Jupyter command `jupyter-nbconvert` not found.
