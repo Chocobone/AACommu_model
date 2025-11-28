@@ -3,7 +3,9 @@ import torch.nn as nn
 from transformers import AutoTokenizer, BertModel, GPT2LMHeadModel
 import numpy as np
 
-# 1. 모델 클래스 정의 (BERT) - 학습 코드와 동일
+# ==========================================
+# 1. 모델 클래스 정의 (BERT)
+# ==========================================
 class AACommuModel(nn.Module):
     def __init__(self, n_classes, model_name):
         super(AACommuModel, self).__init__()
@@ -16,25 +18,31 @@ class AACommuModel(nn.Module):
         output = self.drop(pooled_output)
         return self.out(output)
 
-# 2. 통합 추론 시스템
+# ==========================================
+# 2. 통합 추론 시스템 클래스 (GPT + BERT)
+# ==========================================
 class AACSystem:
     def __init__(self, bert_weight_path, gpt_weight_path, device="cuda:0"):
         self.device = torch.device(device if torch.cuda.is_available() else "cpu")
         print(f"Loading AAC System on {self.device}...")
 
-        # --- A. GPT 로드 (수정된 부분) ---
+        # --- A. GPT 로드 (학습 때와 설정 동일하게) ---
         self.gpt_model_name = "skt/kogpt2-base-v2"
         self.gpt_tokenizer = AutoTokenizer.from_pretrained(self.gpt_model_name)
-        self.gpt_tokenizer.pad_token = self.gpt_tokenizer.eos_token # 패딩 설정 필수
+        # 중요: 학습 때처럼 패딩 토큰 설정
+        self.gpt_tokenizer.pad_token = self.gpt_tokenizer.eos_token 
         
         self.gpt_model = GPT2LMHeadModel.from_pretrained(self.gpt_model_name)
         
-        # [핵심] 학습시킨 GPT 가중치 로드!
+        # [핵심 수정] 학습 때 늘어난 크기만큼(51201) 추론 모델도 늘려줘야 함!
+        self.gpt_model.resize_token_embeddings(len(self.gpt_tokenizer))
+        
+        # 학습된 가중치 로드
         try:
             self.gpt_model.load_state_dict(torch.load(gpt_weight_path, map_location=self.device))
             print("✅ KoGPT2 (생성 모델) 로드 완료.")
         except FileNotFoundError:
-            print(f"🚨 오류: {gpt_weight_path} 파일이 없습니다! GPT 학습을 먼저 진행하세요.")
+            print(f"🚨 오류: {gpt_weight_path} 파일이 없습니다!")
             
         self.gpt_model.to(self.device)
         self.gpt_model.eval()
@@ -56,6 +64,7 @@ class AACSystem:
         self.current_candidates = []
 
     def _score_sentence(self, question, answer):
+        """BERT 점수 계산"""
         text = f"{question} [SEP] {answer}"
         encoding = self.bert_tokenizer.encode_plus(
             text, max_length=128, add_special_tokens=True, return_token_type_ids=False,
@@ -63,6 +72,7 @@ class AACSystem:
         )
         input_ids = encoding['input_ids'].to(self.device)
         attention_mask = encoding['attention_mask'].to(self.device)
+        
         with torch.no_grad():
             outputs = self.bert_model(input_ids, attention_mask)
             prob = torch.nn.functional.softmax(outputs, dim=1)
@@ -71,7 +81,7 @@ class AACSystem:
     def generate_and_filter(self, question, threshold=0.85):
         print(f"\n[Process] 질문: '{question}'")
         
-        # GPT 입력 생성 (<q>질문</s><a>)
+        # GPT 입력 생성
         input_text = f"<q>{question}</s><a>"
         input_ids = self.gpt_tokenizer.encode(input_text, return_tensors='pt').to(self.device)
         
@@ -87,8 +97,10 @@ class AACSystem:
         for out in outputs:
             decoded = self.gpt_tokenizer.decode(out, skip_special_tokens=False)
             if "<a>" in decoded:
-                ans = decoded.split("<a>")[1].split("</s>")[0].strip()
-                if ans: raw_candidates.append(ans)
+                try:
+                    ans = decoded.split("<a>")[1].split("</s>")[0].strip()
+                    if ans: raw_candidates.append(ans)
+                except: pass
         
         raw_candidates = list(set(raw_candidates))
 
@@ -104,7 +116,7 @@ class AACSystem:
         self.current_candidates = [item[0].split() for item in valid_candidates]
         print(f" -> 최종 통과: {len(self.current_candidates)}개")
         
-        for vc in valid_candidates[:3]: # 상위 3개 출력 확인
+        for vc in valid_candidates[:3]: 
             print(f"    (통과) {vc[0]} [{vc[1]:.2f}]")
 
         return [c[0] for c in valid_candidates]
@@ -125,14 +137,14 @@ class AACSystem:
         return sorted(list(recommendations))
 
 if __name__ == "__main__":
-    # 두 개의 학습된 파일 경로를 모두 넣어줍니다.
+    # 실행! (파일명이 정확한지 확인하세요)
     aac = AACSystem(
         bert_weight_path="AACommu_model_best.pt", 
         gpt_weight_path="AAC_KoGPT2_best.pt"
     )
 
     user_q = "주문 도와드릴까요?"
-    passed = aac.generate_and_filter(user_q, threshold=0.8) # 문턱값 조절 가능
+    passed = aac.generate_and_filter(user_q, threshold=0.7) # 테스트 시 문턱값 조절
 
     if passed:
         curr = []
@@ -142,7 +154,7 @@ if __name__ == "__main__":
                 print("✅ 완성!")
                 break
             print(f"\n[Step {step+1}] 추천: {chunks}")
-            choice = chunks[0] # 자동 선택 예시
+            choice = chunks[0] # 자동 선택 (테스트)
             print(f"👉 선택: {choice}")
             curr.append(choice)
         print(f"🎉 결과: {' '.join(curr)}")
