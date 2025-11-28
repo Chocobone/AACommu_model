@@ -1,67 +1,71 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import torch
-import torch.nn as nn # 모델 클래스 정의를 위해 필요
-import numpy as np
+import torch.nn as nn
+from transformers import AutoTokenizer # 토크나이저 로딩용 (예시)
 
-# ---------------------------------------------
-# 1. 모델 클래스 정의 (저장 시점과 동일해야 함)
-# 예: 간단한 Linear Layer를 가진 모델이라고 가정
-class SimpleModel(nn.Module):
-    def __init__(self):
-        super(SimpleModel, self).__init__()
-        # 입력 데이터의 피처(Feature) 개수에 맞게 수정해야 합니다.
-        self.fc = nn.Linear(in_features=4, out_features=1) 
-
-    def forward(self, x):
-        return self.fc(x)
-# ---------------------------------------------
-
+# 1. 설정 (학습 때 사용한 모델 구조와 토크나이저가 필요함)
+MODEL_PATH = "AACommu_model_best.pt"
+TOKENIZER_NAME = "klue/bert-base" # 예시: 학습 때 쓴 토크나이저 이름
 
 app = FastAPI()
 
-# ⚠️ 서버 시작 시 한 번만 로드하는 것이 중요합니다!
-# 모델 클래스 인스턴스 생성
-model = SimpleModel()
+# 2. 모델 클래스 정의 (저장된 .pt 파일과 구조가 같아야 함)
+# (예시용 가짜 클래스입니다. 실제 사용하시는 모델 클래스를 넣으세요)
+class MyLanguageModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.embedding = nn.Embedding(30000, 768)
+        self.fc = nn.Linear(768, 30000) # Vocab Size로 출력
 
-# 학습된 가중치 로드
-try:
-    # 'my_pytorch_model.pt' 파일을 사용한다고 가정
-    model.load_state_dict(torch.load("my_pytorch_model.pt", map_location=torch.device('cpu')))
-except Exception as e:
-    print(f"모델 로딩 중 오류 발생: {e}")
-    # 서버 실행 실패 시 처리
-    
-# ⭐️ 추론(Inference) 모드로 전환:
-# Dropout, BatchNorm 등이 비활성화되어 일관된 예측을 보장합니다.
-model.eval()
+    def forward(self, x):
+        x = self.embedding(x)
+        return self.fc(x)
 
-# 3. 입력 데이터 형식 정의 (Pydantic)
-# 예: 4개의 입력 피처(x1, x2, x3, x4)를 받는다고 가정
-class InputData(BaseModel):
-    features: list[float] # 길이가 4인 리스트를 기대
+# 3. 모델 및 토크나이저 로드 (서버 시작 시 1회)
+print("Loading model and tokenizer...")
+tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME)
+model = MyLanguageModel()
 
-# 4. API 엔드포인트 정의
-@app.post("/predict")
-def predict(data: InputData):
-    
-    # ⭐️ 1. 입력 데이터를 PyTorch 텐서(Tensor)로 변환
-    # (data.features는 [x1, x2, x3, x4] 형태의 리스트)
-    input_tensor = torch.tensor(data.features, dtype=torch.float32).unsqueeze(0)
-    # .unsqueeze(0): (4) -> (1, 4) 형태로 배치 차원(Batch Dimension) 추가
-    
-    # ⭐️ 2. 예측 수행 (Gradient 계산 비활성화)
+# GPU가 있으면 GPU로, 없으면 CPU로
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+model.to(device)
+model.eval() # 추론 모드 필수
+
+# 4. 입력 데이터 정의
+class PromptRequest(BaseModel):
+    text: str # 예: "오늘 날씨가"
+
+@app.post("/predict/next-token")
+def predict_next_token(req: PromptRequest):
+    # A. 텍스트 -> 텐서 변환 (Tokenization)
+    input_ids = tokenizer.encode(req.text, return_tensors="pt")
+    input_ids = input_ids.to(device)
+
+    # B. 추론 (Inference)
     with torch.no_grad():
-        output = model(input_tensor)
+        outputs = model(input_ids) 
+        # outputs 형태는 보통 (Batch_Size, Sequence_Length, Vocab_Size) 입니다.
         
-    # 3. 결과 후처리
-    # 예: 결과를 NumPy로 변환하고, 파이썬 기본 float 형태로 추출
-    prediction_result = output.squeeze().cpu().numpy().item()
-    
-    # 4. JSON 응답 반환
-    return {
-        "prediction": prediction_result,
-        "status": "success"
-    }
+        # 어떤 모델은 outputs가 튜플일 수 있습니다 (예: HuggingFace 모델은 outputs.logits)
+        if hasattr(outputs, 'logits'):
+            logits = outputs.logits
+        else:
+            logits = outputs
 
-# 실행: uvicorn main:app --reload
+    # C. 다음 토큰 선택 (Next Token Selection)
+    # logits[0, -1, :] 의미: 첫번째 배치의, 가장 마지막 단어의, 모든 단어 확률값
+    next_token_logits = logits[0, -1, :]
+    
+    # 가장 확률이 높은 인덱스 찾기 (Argmax)
+    next_token_id = torch.argmax(next_token_logits).item()
+
+    # D. 숫자 ID -> 텍스트 변환 (Decoding)
+    next_token = tokenizer.decode([next_token_id])
+
+    return {
+        "input_text": req.text,
+        "next_token": next_token,
+        "next_token_id": next_token_id
+    }
