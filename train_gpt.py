@@ -1,4 +1,4 @@
-# train_gpt.py
+# train_gpt.py (수정됨)
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.optim import AdamW 
@@ -19,6 +19,7 @@ def set_seed(seed):
 
 set_seed(42)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
 MODEL_NAME = "skt/kogpt2-base-v2"
 MAX_LEN = 64
@@ -26,7 +27,7 @@ BATCH_SIZE = 32
 EPOCHS = 4
 LEARNING_RATE = 5e-5
 
-# 토크나이저 설정 (중요: 패딩 토큰 추가)
+# 토크나이저 설정
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 tokenizer.pad_token = tokenizer.eos_token 
 
@@ -56,12 +57,16 @@ def load_data():
                         q = human[0].get('utterance_cap', '').strip()
                         a = robot[0].get('answer', '').strip()
                         if q and a:
-                            # GPT 학습 포맷: <q>질문</s><a>답변</s>
                             pairs.append(f"<q>{q}</s><a>{a}</s>")
             except: continue
+    print(f"총 {len(pairs)}개의 데이터 로드 완료.")
     return pairs
 
 data_list = load_data()
+if not data_list:
+    print("데이터가 없습니다. 더미 데이터를 사용합니다.")
+    data_list = ["<q>테스트</s><a>테스트</s>"] * 10
+
 train_texts, val_texts = train_test_split(data_list, test_size=0.1, random_state=42)
 
 class GPTDataset(Dataset):
@@ -85,9 +90,14 @@ class GPTDataset(Dataset):
         return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
 
 train_loader = DataLoader(GPTDataset(train_texts, tokenizer, MAX_LEN), batch_size=BATCH_SIZE, shuffle=True)
+val_loader = DataLoader(GPTDataset(val_texts, tokenizer, MAX_LEN), batch_size=BATCH_SIZE, shuffle=False)
 
-# 모델 학습
+# 모델 초기화
 model = GPT2LMHeadModel.from_pretrained(MODEL_NAME)
+
+# [핵심 수정] 모델 임베딩 크기 재조정 (이게 에러 해결의 열쇠입니다!)
+model.resize_token_embeddings(len(tokenizer))
+
 model.to(device)
 optimizer = AdamW(model.parameters(), lr=LEARNING_RATE)
 
@@ -95,17 +105,31 @@ print("=== GPT 학습 시작 ===")
 for epoch in range(EPOCHS):
     model.train()
     total_loss = 0
+    batch_count = 0
     for batch in train_loader:
         input_ids = batch["input_ids"].to(device)
         mask = batch["attention_mask"].to(device)
         labels = batch["labels"].to(device)
+        
+        # 입력값 범위 체크 (디버깅용 안전장치)
+        if torch.max(input_ids) >= len(tokenizer):
+            print("🚨 에러 감지: 토크나이저 범위 밖의 ID가 있습니다.")
+            continue
+
         outputs = model(input_ids, attention_mask=mask, labels=labels)
         loss = outputs.loss
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        
         total_loss += loss.item()
-    print(f"Epoch {epoch+1} Loss: {total_loss/len(train_loader):.4f}")
+        batch_count += 1
+        
+        if batch_count % 50 == 0:
+            print(f"  Batch {batch_count}: Loss {loss.item():.4f}")
+
+    avg_loss = total_loss / len(train_loader)
+    print(f"Epoch {epoch+1} Average Loss: {avg_loss:.4f}")
 
 torch.save(model.state_dict(), "AAC_KoGPT2_best.pt")
 print("✅ GPT 학습 완료: AAC_KoGPT2_best.pt 생성됨")
