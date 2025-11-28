@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import torch
 import torch.nn as nn
-from transformers import AutoTokenizer # 토크나이저 로딩용 (예시)
+from transformers import AutoTokenizer, AutoModel # 토크나이저 로딩용 (예시)
 
 # 1. 설정 (학습 때 사용한 모델 구조와 토크나이저가 필요함)
 MODEL_PATH = "AACommu_model_best.pt"
@@ -13,19 +13,21 @@ app = FastAPI()
 # 2. 모델 클래스 정의 (저장된 .pt 파일과 구조가 같아야 함)
 # (예시용 가짜 클래스입니다. 실제 사용하시는 모델 클래스를 넣으세요)
 class MyLanguageModel(nn.Module):
-    def __init__(self):
+    def __init__(self, tokenizer_name):
         super().__init__()
-        self.embedding = nn.Embedding(30000, 768)
-        self.fc = nn.Linear(768, 30000) # Vocab Size로 출력
+        self.bert = AutoModel.from_pretrained(tokenizer_name)
+        self.out = nn.Linear(self.bert.config.hidden_size, 2)
 
-    def forward(self, x):
-        x = self.embedding(x)
-        return self.fc(x)
+    def forward(self, input_ids):
+        outputs = self.bert(input_ids=input_ids)
+        sequence_output = outputs.last_hidden_state
+        prediction_scores = self.out(sequence_output)
+        return prediction_scores
 
 # 3. 모델 및 토크나이저 로드 (서버 시작 시 1회)
 print("Loading model and tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME)
-model = MyLanguageModel()
+model = MyLanguageModel(TOKENIZER_NAME)
 
 # GPU가 있으면 GPU로, 없으면 CPU로
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
