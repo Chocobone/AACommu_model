@@ -3,7 +3,9 @@
 
 import torch
 from torch.utils.data import Dataset, DataLoader
-from transformers import AutoTokenizer, GPT2LMHeadModel, AdamW
+# AdamW 경고 해결: transformers 대신 torch.optim 사용
+from torch.optim import AdamW 
+from transformers import AutoTokenizer, GPT2LMHeadModel
 import pandas as pd
 import json
 from pathlib import Path
@@ -30,12 +32,15 @@ BATCH_SIZE = 32
 EPOCHS = 3
 LEARNING_RATE = 5e-5
 
+# 토크나이저 초기화
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+# [🚨 중요 수정] KoGPT2는 기본 pad_token이 없으므로 eos_token을 pad_token으로 설정
+# 이 코드가 없으면 "ValueError: Asking to pad but the tokenizer..." 에러가 발생합니다.
+tokenizer.pad_token = tokenizer.eos_token
 
 # --- 2. 데이터 추출 (GPT 형식으로 변환) ---
 # GPT 학습 데이터 형식: "<q>질문</s><a>답변</s>" 
-# 모델이 <q>와 <a> 토큰을 보고 질문/답변을 구분하게 함
-
 INPUT_DIR_NAMES = [
     "TL_01.식당카페_01.입장_및_이용안내",
     "TL_01.식당카페_02.자리안내",
@@ -50,7 +55,6 @@ def load_data():
     pairs = []
     print("데이터 로딩 중...")
     
-    # 1. 파일 순회
     for dir_name in INPUT_DIR_NAMES:
         dir_path = INPUT_DIR / dir_name
         if not dir_path.is_dir(): continue
@@ -62,17 +66,13 @@ def load_data():
                     
                 video = data.get('video', {})
                 for interaction in video.get('interactions', []):
-                    # 질문 추출
                     human = interaction.get('human_event', {}).get('utterances', [])
                     q_text = human[0].get('utterance_cap', '').strip() if human else ""
                     
-                    # 답변 추출
                     robot = interaction.get('robot_response', [])
                     a_text = robot[0].get('answer', '').strip() if robot else ""
                     
                     if q_text and a_text:
-                        # GPT 학습용 포맷팅
-                        # <q>, <a> 같은 토큰 대신 명확한 구분자 사용
                         # KoGPT2의 bos_token(</s>)을 문장 끝에 붙임
                         formatted_text = f"<q>{q_text}</s><a>{a_text}</s>"
                         pairs.append(formatted_text)
@@ -101,9 +101,6 @@ class GPTDataset(Dataset):
         self.texts = texts
         self.tokenizer = tokenizer
         self.max_len = max_len
-        # 스페셜 토큰 추가 (질문/답변 구분용)
-        # 실제로는 tokenizer에 add_special_tokens를 하는 게 정석이지만, 
-        # 여기선 간단히 기존 텍스트로 처리
         
     def __len__(self):
         return len(self.texts)
@@ -122,8 +119,6 @@ class GPTDataset(Dataset):
         input_ids = encoding["input_ids"].flatten()
         attention_mask = encoding["attention_mask"].flatten()
         
-        # GPT 학습의 핵심: labels는 input_ids와 같음 (Next Token Prediction)
-        # 단, 패딩(pad_token_id) 부분은 Loss 계산에서 제외하기 위해 -100으로 설정
         labels = input_ids.clone()
         labels[input_ids == self.tokenizer.pad_token_id] = -100
         
@@ -190,28 +185,17 @@ print("✅ 모델 저장 완료: AAC_KoGPT2_best.pt")
 # 사용자가 원했던 "확률적 Top 3 추천" 기능입니다.
 
 def recommend_next_chunks(question, current_answer, top_k=3):
-    """
-    질문(question)과 현재까지 완성된 답변(current_answer)을 넣으면
-    다음에 올 단어 3개를 추천해줍니다.
-    """
     model.eval()
     
     # 문맥 생성: <q>질문</s><a>현재답변
     input_text = f"<q>{question}</s><a>{current_answer}"
     
-    # 토크나이징
     input_ids = tokenizer.encode(input_text, return_tensors="pt").to(device)
     
     with torch.no_grad():
         outputs = model(input_ids)
-        
-        # 마지막 토큰(가장 최근 단어)에 대한 다음 토큰 예측값(Logits) 가져오기
         next_token_logits = outputs.logits[0, -1, :]
-        
-        # Softmax로 확률 변환
         probs = torch.nn.functional.softmax(next_token_logits, dim=-1)
-        
-        # 상위 K개 확률과 인덱스 추출
         top_k_probs, top_k_indices = torch.topk(probs, top_k)
         
         results = []
@@ -226,7 +210,7 @@ def recommend_next_chunks(question, current_answer, top_k=3):
 # --- 6. 시연 (Simulation) ---
 print("\n--- 🛒 AAC 키오스크 시연 ---")
 q = "주문 도와드릴까요?"
-curr_a = "" # 처음엔 아무것도 없음
+curr_a = "" 
 
 print(f"🤖 점원: {q}")
 
@@ -236,11 +220,10 @@ print(f"User 현재 상태: (공란)")
 print(f"추천 청크: {[s[0] for s in suggestions]}")
 
 # 가정: 사용자가 추천된 것 중 하나를 선택하거나 직접 입력함
-selected_word = "아이스" # 예: 사용자가 '아이스' 선택
+selected_word = "아이스" 
 curr_a += selected_word
 
 # Step 2: 다음 단어 추천 (조건부 확률)
 suggestions = recommend_next_chunks(q, curr_a)
 print(f"\nUser 현재 상태: {curr_a}")
 print(f"추천 청크: {[s[0] for s in suggestions]}")
-# 여기서 모델은 '아이스' 뒤에 올 확률 높은 단어(예: '아메리카노', '라떼' 등)를 추천함
