@@ -1,70 +1,90 @@
+# server.py
+import torch
+from transformers import PreTrainedTokenizerFast, GPT2LMHeadModel
 from fastapi import FastAPI
 from pydantic import BaseModel
-import torch
-import torch.nn as nn
-from transformers import AutoTokenizer, BertModel
+from typing import List
 
-# 1. 설정
-MODEL_PATH = "AACommu_model_best.pt"
-TOKENIZER_NAME = "klue/bert-base" # ⭐️ 학습 때 쓴 모델명과 일치해야 함
+# ==========================================
+# 1. AI 모델 로드 (서버 켤 때 한 번만 실행됨)
+# ==========================================
+print("모델을 로드 중입니다... 잠시만 기다려주세요.")
+# SKT의 KoGPT-2 모델 사용 (한국어 성능 우수)
+model_name = "skt/kogpt2-base-v2"
+tokenizer = PreTrainedTokenizerFast.from_pretrained(model_name,
+  bos_token='</s>', eos_token='</s>', unk_token='<unk>',
+  pad_token='<pad>', mask_token='<mask>')
+model = GPT2LMHeadModel.from_pretrained(model_name)
+print("모델 로드 완료!")
 
+# ==========================================
+# 2. 추천 알고리즘 로직 (핵심)
+# ==========================================
+def generate_next_chunks(context_question: str, current_answer: str) -> List[str]:
+    """
+    context_question: 상대방의 질문 (예: "점심 뭐 먹을래?")
+    current_answer: 내가 지금까지 입력한 답변 (예: "나는 오늘")
+    """
+    
+    # 모델에게 줄 프롬프트 구성 (질문과 답변을 이어붙임)
+    # Q와 A라는 태그를 붙여서 모델이 대화 상황임을 인지하게 유도
+    if context_question:
+        prompt = f"Q: {context_question}\nA: {current_answer}"
+    else:
+        prompt = f"A: {current_answer}"
+
+    input_ids = tokenizer.encode(prompt, return_tensors='pt')
+
+    # -------------------------------------------------
+    # 핵심 알고리즘: Top-k & Top-p Sampling
+    # 확률이 높은 단어 하나만 뽑는 게 아니라, 
+    # 그럴싸한 후보 여러 개를 다양하게 뽑아내는 기법입니다.
+    # -------------------------------------------------
+    with torch.no_grad():
+        outputs = model.generate(
+            input_ids,
+            max_length=len(input_ids[0]) + 5,  # 현재 길이보다 5토큰(약 2~3어절) 더 예측
+            do_sample=True,      # 확률적 샘플링 사용 (매번 조금씩 다른 추천)
+            top_k=50,            # 확률 상위 50개 후보 중에서만 선택
+            top_p=0.95,          # 누적 확률 95% 내의 후보만 선택 (이상한 단어 제외)
+            temperature=0.8,     # 창의성 조절 (낮을수록 정확, 높을수록 창의적)
+            num_return_sequences=3, # 서로 다른 후보 3개를 생성해라
+            eos_token_id=tokenizer.eos_token_id,
+            repetition_penalty=2.0  # 했던 말 또 하지 않게 페널티 부여
+        )
+
+    candidates = []
+    for output in outputs:
+        # 모델이 생성한 전체 문장에서 프롬프트 부분을 제거하고 '새로 생성된 부분'만 추출
+        decoded_text = tokenizer.decode(output, skip_special_tokens=True)
+        generated_part = decoded_text[len(prompt):].strip()
+        
+        # 첫 번째 공백이나 문장 부호를 기준으로 '청크'를 자름
+        # 예: "김치찌개 먹고 싶어" -> "김치찌개"
+        chunks = generated_part.split()
+        if chunks:
+            # 첫 번째 덩어리만 추천 후보로 등록
+            first_chunk = chunks[0]
+            if first_chunk not in candidates: # 중복 제거
+                candidates.append(first_chunk)
+
+    # 만약 모델이 아무것도 추천 못했다면 기본값 제공 (에러 방지)
+    if not candidates:
+        return ["...", "음,", "저기"]
+
+    return candidates
+
+# ==========================================
+# 3. 서버 API 정의 (FastAPI)
+# ==========================================
 app = FastAPI()
 
-# 2. 모델 클래스 정의
-class MyLanguageModel(nn.Module):
-    def __init__(self):
-        super().__init__()
-        # ⭐️ 여기서도 klue/bert-base를 로드해야 사이즈 오류가 안 납니다.
-        self.bert = BertModel.from_pretrained(TOKENIZER_NAME)
-        self.out = nn.Linear(768, 2) # 분류 모델 (예: 0 또는 1 예측)
+class RequestData(BaseModel):
+    partner_speech: str  # 상대방 말
+    my_speech: str       # 내 현재 입력
 
-    def forward(self, input_ids, attention_mask):
-        output = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        return self.out(output.pooler_output)
-
-# 3. 로딩
-print("Loading model...")
-tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME)
-model = MyLanguageModel()
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# map_location 추가하여 안전하게 로드
-model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
-model.to(device)
-model.eval()
-
-# 4. 입력 데이터
-class PromptRequest(BaseModel):
-    text: str
-
-# ⭐️ 엔드포인트 이름을 기능에 맞게 수정 (예: 분류 예측)
-@app.post("/predict/classification")
-def predict_classification(req: PromptRequest):
-    # A. 토크나이징 (attention_mask도 함께 받음)
-    inputs = tokenizer(req.text, return_tensors="pt", padding=True, truncation=True, max_length=128)
-    
-    input_ids = inputs['input_ids'].to(device)
-    attention_mask = inputs['attention_mask'].to(device) # ⭐️ 필수 인자
-
-    # B. 추론
-    with torch.no_grad():
-        # forward 함수에 인자 2개 모두 전달
-        outputs = model(input_ids=input_ids, attention_mask=attention_mask)
-        
-    # C. 결과 처리 (분류 모델이므로 가장 높은 점수의 클래스 선택)
-    # outputs shape: [1, 2] -> 단어 생성이 아니라 클래스 확률임
-    predicted_class_id = torch.argmax(outputs, dim=1).item()
-    
-    return {
-        "input_text": req.text,
-        "predicted_class": predicted_class_id, # 0 또는 1
-        "message": "분류가 완료되었습니다."
-    }
-class HealthResponse(BaseModel):
-    status: str
-    version: str = "1.0.0"
-
-
-@app.get("/")
-async def health_check():
-    return HealthResponse(status='ok')
+@app.post("/recommend")
+async def recommend(data: RequestData):
+    # 위에서 만든 알고리즘 실행
+    results = generate_next_chunks(data.partner_speech, data.my_speech)
+    return {"recommendations": results}
