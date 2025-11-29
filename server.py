@@ -1,77 +1,65 @@
-from fastapi import FastAPI, APIRouter, status
+from fastapi import FastAPI
 from pydantic import BaseModel
 import torch
 import torch.nn as nn
-from transformers import AutoTokenizer, BertModel # 토크나이저 로딩용 (예시)
+from transformers import AutoTokenizer, BertModel
 
-# 1. 설정 (학습 때 사용한 모델 구조와 토크나이저가 필요함)
+# 1. 설정
 MODEL_PATH = "AACommu_model_best.pt"
-TOKENIZER_NAME = "klue/bert-base" # 예시: 학습 때 쓴 토크나이저 이름
+TOKENIZER_NAME = "klue/bert-base" # ⭐️ 학습 때 쓴 모델명과 일치해야 함
 
 app = FastAPI()
 
-# 2. 모델 클래스 정의 (저장된 .pt 파일과 구조가 같아야 함)
-# (예시용 가짜 클래스입니다. 실제 사용하시는 모델 클래스를 넣으세요)
+# 2. 모델 클래스 정의
 class MyLanguageModel(nn.Module):
     def __init__(self):
         super().__init__()
-        # 기존: self.embedding = nn.Embedding(...) 
-        # 수정: BERT 모델 로드
-        self.bert = BertModel.from_pretrained("bert-base-multilingual-cased") 
-        self.out = nn.Linear(768, 2) # 예시 출력층
+        # ⭐️ 여기서도 klue/bert-base를 로드해야 사이즈 오류가 안 납니다.
+        self.bert = BertModel.from_pretrained(TOKENIZER_NAME)
+        self.out = nn.Linear(768, 2) # 분류 모델 (예: 0 또는 1 예측)
 
     def forward(self, input_ids, attention_mask):
         output = self.bert(input_ids=input_ids, attention_mask=attention_mask)
         return self.out(output.pooler_output)
 
-# 3. 모델 및 토크나이저 로드 (서버 시작 시 1회)
-print("Loading model and tokenizer...")
+# 3. 로딩
+print("Loading model...")
 tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME)
 model = MyLanguageModel()
 
-# GPU가 있으면 GPU로, 없으면 CPU로
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# map_location 추가하여 안전하게 로드
 model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
 model.to(device)
-model.eval() # 추론 모드 필수
+model.eval()
 
-# 4. 입력 데이터 정의
+# 4. 입력 데이터
 class PromptRequest(BaseModel):
-    text: str # 예: "오늘 날씨가"
+    text: str
 
-@app.post("/predict/next-token")
-def predict_next_token(req: PromptRequest):
-    # A. 텍스트 -> 텐서 변환 (Tokenization)
-    input_ids = tokenizer.encode(req.text, return_tensors="pt")
-    input_ids = input_ids.to(device)
-
-    # B. 추론 (Inference)
-    with torch.no_grad():
-        outputs = model(input_ids) 
-        # outputs 형태는 보통 (Batch_Size, Sequence_Length, Vocab_Size) 입니다.
-        
-        # 어떤 모델은 outputs가 튜플일 수 있습니다 (예: HuggingFace 모델은 outputs.logits)
-        if hasattr(outputs, 'logits'):
-            logits = outputs.logits
-        else:
-            logits = outputs
-
-    # C. 다음 토큰 선택 (Next Token Selection)
-    # logits[0, -1, :] 의미: 첫번째 배치의, 가장 마지막 단어의, 모든 단어 확률값
-    next_token_logits = logits[0, -1, :]
+# ⭐️ 엔드포인트 이름을 기능에 맞게 수정 (예: 분류 예측)
+@app.post("/predict/classification")
+def predict_classification(req: PromptRequest):
+    # A. 토크나이징 (attention_mask도 함께 받음)
+    inputs = tokenizer(req.text, return_tensors="pt", padding=True, truncation=True, max_length=128)
     
-    # 가장 확률이 높은 인덱스 찾기 (Argmax)
-    next_token_id = torch.argmax(next_token_logits).item()
+    input_ids = inputs['input_ids'].to(device)
+    attention_mask = inputs['attention_mask'].to(device) # ⭐️ 필수 인자
 
-    # D. 숫자 ID -> 텍스트 변환 (Decoding)
-    next_token = tokenizer.decode([next_token_id])
-
+    # B. 추론
+    with torch.no_grad():
+        # forward 함수에 인자 2개 모두 전달
+        outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+        
+    # C. 결과 처리 (분류 모델이므로 가장 높은 점수의 클래스 선택)
+    # outputs shape: [1, 2] -> 단어 생성이 아니라 클래스 확률임
+    predicted_class_id = torch.argmax(outputs, dim=1).item()
+    
     return {
         "input_text": req.text,
-        "next_token": next_token,
-        "next_token_id": next_token_id
+        "predicted_class": predicted_class_id, # 0 또는 1
+        "message": "분류가 완료되었습니다."
     }
-
 class HealthResponse(BaseModel):
     status: str
     version: str = "1.0.0"
