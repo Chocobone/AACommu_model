@@ -184,9 +184,8 @@ def main():
         
         print(f"Epoch {epoch+1} Avg Loss: {total_loss / len(loader):.4f}")
 
-    # 4. 저장 및 테스트
-    model.save_pretrained(save_path)
-    tokenizer.save_pretrained(save_path)
+    # 4. 저장 및 테스트# 4. 저장
+    torch.save(model.state_dict(), save_path)
     print(f"\n💾 모델 저장 완료: {save_path}")
 
     # 간단 테스트
