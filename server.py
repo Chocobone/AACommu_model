@@ -84,8 +84,8 @@ class RequestData(BaseModel):
     stt_text: str  # 상대방 말
     history: str       # 내 현재 입력
 
-@app.post("/recommend   ")
+@app.post("/recommend")
 async def recommend(data: RequestData):
     # 위에서 만든 알고리즘 실행
-    results = generate_next_chunks(data.partner_speech, data.my_speech)
+    results = generate_next_chunks(data.stt_text, data.history)
     return {"recommendations": results}
