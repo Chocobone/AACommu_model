@@ -29,26 +29,7 @@ def generate_next_chunks(category: str, context_question: str, current_answer: l
     # 모델에게 줄 프롬프트 구성 (질문과 답변을 이어붙임)
     # Q와 A라는 태그를 붙여서 모델이 대화 상황임을 인지하게 유도
     if context_question:
-        prompt = f"""You are a predictive Conversational AI designed to assist in constructing a response sentence chunk by chunk.
-
-        Your task is to act as a **customer** in the location specified by `"category"`. Based on the staff's question (`"context_question"`) and the sentence constructed so far (`"current_answer"`), generate **3 distinct candidate chunks** for the immediate next part of the sentence.
-
-        **Instructions:**
-        1.  **Context Awareness:** Analyze the `"category"` and `"context_question"` to determine the appropriate intent and tone.
-        2.  **Sentence Continuation:**
-            * If `"current_answer"` is **empty**, provide 3 different ways to **start** a natural response.
-            * If `"current_answer"` contains text, provide 3 different ways to **continue** that sentence grammatically and contextually.
-        3.  **Chunk Size:** Each candidate should be a meaningful word or short phrase (e.g., a noun, a verb ending, or a conjunction) that naturally follows the input.
-        4.  **Language:** The candidates must be in **Korean**.
-        5.  **Output Format:** Return a JSON object with a single key `"candidate_chunks"` containing a list of 3 strings.
-
-        ### Input JSON Example:
-        ```json
-        {{
-        "category": "{category}",
-        "context_question": "{context_question}",
-        "current_answer": "{current_answer}"
-        }}"""
+        prompt = f"Q: {context_question}\n context: {category} A: {current_answer}"
     else:
         prompt = f"A: {current_answer}"
 
