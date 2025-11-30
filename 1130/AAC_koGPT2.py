@@ -60,20 +60,17 @@ class AACDataProcessor:
         # 3. 데이터 파싱 (인코딩 utf-8-sig 적용)
         for json_path in tqdm(json_files, desc="JSON 파싱"):
             try:
-                # [중요] BOM 이슈 해결을 위해 utf-8-sig 사용
                 with open(json_path, 'r', encoding='utf-8-sig') as f:
                     data = json.load(f)
                 
                 if 'video' not in data: continue
                 interactions = data['video'].get('interactions', [])
                 for interaction in interactions:
-                    # 손님 말 (Target)
                     human_text = ""
                     if 'human_event' in interaction and 'utterances' in interaction['human_event']:
                         utts = interaction['human_event']['utterances']
                         if utts: human_text = utts[0].get('utterance_cap', '').strip()
                     
-                    # 직원 말 (Input)
                     robot_text = ""
                     if 'robot_response' in interaction:
                         resps = interaction['robot_response']
@@ -124,24 +121,23 @@ class KoGPT2Dataset(Dataset):
 
 # --- 4. 메인 실행 함수 ---
 def main():
-    # 저장 경로
-    save_path = "./aac_kogpt2_model"
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    # 저장 파일명 설정 (.pt 파일)
+    # BERT와 동일하게 현재 디렉토리에 저장됩니다.
+    save_model_path = "./aac_kogpt2_model.pt"
+    save_tokenizer_path = "./aac_tokenizer" # 토크나이저는 폴더로 저장해야 안전함
 
     # 1. 모델 & 토크나이저 설정
     tokenizer = PreTrainedTokenizerFast.from_pretrained(MODEL_NAME,
         bos_token='</s>', eos_token='</s>', unk_token='<unk>',
         pad_token='<pad>', mask_token='<mask>')
     
-    # 화자 구분 토큰 추가
     tokenizer.add_special_tokens({'additional_special_tokens': ['<usr>', '<sys>']})
     
     model = GPT2LMHeadModel.from_pretrained(MODEL_NAME)
     model.resize_token_embeddings(len(tokenizer))
     model.to(device)
 
-    # 2. 데이터 로드 (확인된 경로 사용)
+    # 2. 데이터 로드
     data_dir = "/local_datasets/AACommu/Training/02.라벨링데이터" 
     
     if not os.path.exists(data_dir):
@@ -171,7 +167,6 @@ def main():
             inputs = batch['input_ids'].to(device)
             mask = batch['attention_mask'].to(device)
             
-            # GPT는 입력을 그대로 라벨로 사용 (Shift는 모델 내부에서 처리됨)
             outputs = model(input_ids=inputs, attention_mask=mask, labels=inputs)
             loss = outputs.loss
             
@@ -184,11 +179,20 @@ def main():
         
         print(f"Epoch {epoch+1} Avg Loss: {total_loss / len(loader):.4f}")
 
-    # 4. 저장 및 테스트# 4. 저장
-    torch.save(model.state_dict(), save_path)
-    print(f"\n💾 모델 저장 완료: {save_path}")
+    # 4. 저장 (수정됨)
+    print("\n💾 저장 진행 중...")
+    
+    # 모델 가중치만 .pt 파일로 저장 (BERT와 동일한 방식)
+    torch.save(model.state_dict(), save_model_path)
+    print(f"   - 모델 가중치: {save_model_path}")
+    
+    # 토크나이저는 폴더에 저장 (특수 토큰 정보 유지용)
+    if not os.path.exists(save_tokenizer_path):
+        os.makedirs(save_tokenizer_path)
+    tokenizer.save_pretrained(save_tokenizer_path)
+    print(f"   - 토크나이저: {save_tokenizer_path}")
 
-    # 간단 테스트
+    # 5. 간단 테스트
     def generate_response(text):
         model.eval()
         input_text = f"<usr>{text}<sys>"
@@ -206,8 +210,9 @@ def main():
         return tokenizer.decode(outputs[0], skip_special_tokens=False)
 
     print("\n--- [TEST] ---")
-    print(f"Q: 어서오세요, 주문하시겠어요?")
-    print(f"A: {generate_response('어서오세요, 주문하시겠어요?')}")
+    test_q = "어서오세요, 주문하시겠어요?"
+    print(f"Q: {test_q}")
+    print(f"A: {generate_response(test_q)}")
 
 if __name__ == "__main__":
     main()
