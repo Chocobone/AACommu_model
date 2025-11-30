@@ -80,10 +80,11 @@ def generate_next_chunks(context_question: str, current_answer: str) -> List[str
 app = FastAPI()
 
 class RequestData(BaseModel):
-    partner_speech: str  # 상대방 말
-    my_speech: str       # 내 현재 입력
+    category: str
+    stt_text: str  # 상대방 말
+    history: str       # 내 현재 입력
 
-@app.post("/recommend")
+@app.post("/recommend   ")
 async def recommend(data: RequestData):
     # 위에서 만든 알고리즘 실행
     results = generate_next_chunks(data.partner_speech, data.my_speech)
