@@ -71,30 +71,61 @@ class AACDataProcessor:
     def __init__(self, data_dir):
         self.data_dir = Path(data_dir)
         
+    # 기존 AACDataProcessor 클래스 내부의 load_data 함수를 이걸로 통째로 바꾸세요
     def load_data(self):
         pairs = []
         
-        print(f"🎯 학습 대상 디렉토리 ({len(INPUT_DIR_NAMES)}개) 순회 시작...")
+        # [핵심 수정] iterdir() 대신 rglob('*')을 사용하여 하위 폴더를 깊숙이 탐색
+        print(f"🔍 '{self.data_dir}' 경로 하위에서 'TL_01' 폴더를 찾는 중...")
         
-        for dir_name in INPUT_DIR_NAMES:
-            target_dir = self.data_dir / dir_name
-            if not target_dir.exists():
-                print(f"  (Skip) {dir_name} 없음")
-                continue
-                
-            json_files = list(target_dir.rglob('*.json'))
+        # 1. 모든 하위 경로 중 디렉토리이면서 이름이 'TL_01'로 시작하는 것 찾기
+        target_dirs = [
+            p for p in self.data_dir.rglob("*") 
+            if p.is_dir() and p.name.startswith("TL_01")
+        ]
+        
+        if not target_dirs:
+            print(f"❌ '{self.data_dir}' 안에서 'TL_01'로 시작하는 폴더를 하나도 못 찾았습니다.")
+            print("   -> 경로 설정이 상위 폴더(예: AACommu)로 되어있는지, 혹은 절대 경로가 맞는지 확인해주세요.")
+            return pd.DataFrame()
+        
+        print(f"🎯 발견된 폴더 ({len(target_dirs)}개):")
+        for d in target_dirs[:3]: # 너무 많으면 3개만 출력
+            print(f"  - {d}")
+        if len(target_dirs) > 3: print("  ... (생략)")
+
+        # 2. JSON 파일 수집
+        json_files = []
+        for d in target_dirs:
+            json_files.extend(list(d.glob('*.json')))
             
-            for json_path in json_files:
-                try:
-                    with open(json_path, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
+        print(f"📂 총 {len(json_files)}개의 JSON 파일을 분석합니다.")
+
+        # 3. 파싱 (기존과 동일)
+        for json_path in tqdm(json_files, desc="JSON 파싱"):
+            try:
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                if 'video' not in data: continue
+                interactions = data['video'].get('interactions', [])
+                for interaction in interactions:
+                    human_text = ""
+                    if 'human_event' in interaction and 'utterances' in interaction['human_event']:
+                        utts = interaction['human_event']['utterances']
+                        if utts: human_text = utts[0].get('utterance_cap', '').strip()
                     
-                    # 공통 추출 함수 사용
-                    extracted = extract_dialogue_pairs_from_json(data)
-                    pairs.extend(extracted)
+                    robot_text = ""
+                    if 'robot_response' in interaction:
+                        resps = interaction['robot_response']
+                        if resps: robot_text = resps[0].get('answer', '').strip()
                     
-                except Exception:
-                    continue
+                    if human_text and robot_text:
+                        pairs.append({"q": robot_text, "a": human_text})
+            except: continue
+                
+        print(f"✅ 총 {len(pairs)}개의 대화 쌍 추출 완료.")
+        return pd.DataFrame(pairs)
                 
         print(f"✅ 총 {len(pairs)}개의 대화 쌍 추출 완료.")
         return pd.DataFrame(pairs)

@@ -94,30 +94,68 @@ def extract_dialogue_pairs_from_json(json_data):
     return result_pairs
 
 # --- 2. 데이터 처리 및 Negative Sampling ---
+# 기존 create_bert_dataset 함수를 이걸로 통째로 바꾸세요
 def create_bert_dataset(data_dir):
     data_path = Path(data_dir)
-    raw_pairs = []
     
-    print(f"🎯 학습 대상 디렉토리 ({len(INPUT_DIR_NAMES)}개) 순회 시작...")
+    print(f"🔍 '{data_path}' 경로 하위에서 'TL_01' 폴더를 찾는 중...")
+    
+    # [핵심 수정] rglob으로 깊이 상관없이 'TL_01' 폴더 찾기
+    target_dirs = [
+        p for p in data_path.rglob("*") 
+        if p.is_dir() and p.name.startswith("TL_01")
+    ]
+    
+    if not target_dirs:
+        print(f"❌ '{data_path}' 안에서 'TL_01'로 시작하는 폴더를 찾을 수 없습니다.")
+        return pd.DataFrame()
 
-    for dir_name in INPUT_DIR_NAMES:
-        target_dir = data_path / dir_name
-        if not target_dir.exists():
-            print(f"  (Skip) {dir_name} 디렉토리가 존재하지 않습니다.")
-            continue
-            
-        json_files = list(target_dir.rglob('*.json'))
+    print(f"🎯 발견된 폴더 ({len(target_dirs)}개)")
+
+    raw_pairs = []
+    json_files = []
+    for d in target_dirs:
+        json_files.extend(list(d.glob('*.json')))
         
-        for json_path in json_files:
-            try:
-                with open(json_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
+    print(f"📂 총 {len(json_files)}개의 JSON 파일을 분석합니다.")
+
+    for json_path in tqdm(json_files, desc="데이터 추출"):
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            if 'video' not in data: continue
+            interactions = data['video'].get('interactions', [])
+            for interaction in interactions:
+                h_txt = ""
+                if 'human_event' in interaction:
+                    utts = interaction['human_event'].get('utterances', [])
+                    if utts: h_txt = utts[0].get('utterance_cap', '').strip()
+
+                r_txt = ""
+                if 'robot_response' in interaction:
+                    resps = interaction['robot_response']
+                    if resps: r_txt = resps[0].get('answer', '').strip()
                 
-                # AAC_model_BERT 스타일의 추출 함수 사용
-                pairs = extract_dialogue_pairs_from_json(data)
-                raw_pairs.extend(pairs)
-            except Exception:
-                continue
+                if h_txt and r_txt:
+                    raw_pairs.append({'q': r_txt, 'a': h_txt})
+        except: continue
+
+    if not raw_pairs: return pd.DataFrame()
+
+    # Negative Sampling 로직 (기존과 동일)
+    processed_data = []
+    all_answers = [p['a'] for p in raw_pairs]
+    
+    for p in raw_pairs:
+        processed_data.append({'text_a': p['q'], 'text_b': p['a'], 'label': 1})
+        while True:
+            random_a = random.choice(all_answers)
+            if random_a != p['a']: break
+        processed_data.append({'text_a': p['q'], 'text_b': random_a, 'label': 0})
+        
+    print(f"✅ 최종 데이터: {len(processed_data)}개")
+    return pd.DataFrame(processed_data)
 
     print(f"✅ 원본 대화 쌍 {len(raw_pairs)}개 추출 완료.")
     if not raw_pairs: return pd.DataFrame()
