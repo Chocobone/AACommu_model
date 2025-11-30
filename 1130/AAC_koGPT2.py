@@ -9,7 +9,7 @@ import os
 import random
 import numpy as np
 
-# --- 1. 설정 ---
+# --- 1. 기본 설정 ---
 def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
@@ -24,61 +24,21 @@ print(f"Using device: {device}")
 
 MODEL_NAME = "skt/kogpt2-base-v2"
 MAX_LEN = 128
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 EPOCHS = 5
 LR = 3e-5
 
-# --- [수정됨] 데이터 로딩 관련 설정 (AAC_model_BERT.py 스타일) ---
-INPUT_DIR_NAMES = [
-    "TL_01.식당카페_01.입장_및_이용안내",
-    "TL_01.식당카페_02.자리안내",
-    "TL_01.식당카페_03.메뉴추천",
-    "TL_01.식당카페_04.메뉴주문",
-    "TL_01.식당카페_05.식음료서빙",
-    "TL_01.식당카페_06.결제_및_할인_포인트적립_안내",
-]
-
-def extract_dialogue_pairs_from_json(json_data):
-    """AAC_model_BERT.py의 파싱 로직 적용"""
-    pairs = []
-    video_data = json_data.get('video')
-    if not video_data:
-        return pairs
-
-    interactions = video_data.get('interactions', [])
-    for interaction in interactions:
-        # 손님 말 (Target)
-        human_text = ""
-        if 'human_event' in interaction and 'utterances' in interaction['human_event']:
-            utts = interaction['human_event']['utterances']
-            if utts: human_text = utts[0].get('utterance_cap', '').strip()
-        
-        # 직원 말 (Input)
-        robot_text = ""
-        if 'robot_response' in interaction:
-            resps = interaction['robot_response']
-            if resps: robot_text = resps[0].get('answer', '').strip()
-        
-        if human_text and robot_text:
-            pairs.append({
-                "q": robot_text, 
-                "a": human_text
-            })
-    return pairs
-
-# --- 2. 데이터셋 로드 및 파싱 클래스 ---
+# --- 2. 데이터 처리 클래스 ---
 class AACDataProcessor:
     def __init__(self, data_dir):
         self.data_dir = Path(data_dir)
         
-    # 기존 AACDataProcessor 클래스 내부의 load_data 함수를 이걸로 통째로 바꾸세요
     def load_data(self):
         pairs = []
         
-        # [핵심 수정] iterdir() 대신 rglob('*')을 사용하여 하위 폴더를 깊숙이 탐색
+        # 1. 경로 탐색: 하위 모든 폴더 중 'TL_01'로 시작하는 폴더 찾기
         print(f"🔍 '{self.data_dir}' 경로 하위에서 'TL_01' 폴더를 찾는 중...")
         
-        # 1. 모든 하위 경로 중 디렉토리이면서 이름이 'TL_01'로 시작하는 것 찾기
         target_dirs = [
             p for p in self.data_dir.rglob("*") 
             if p.is_dir() and p.name.startswith("TL_01")
@@ -86,13 +46,9 @@ class AACDataProcessor:
         
         if not target_dirs:
             print(f"❌ '{self.data_dir}' 안에서 'TL_01'로 시작하는 폴더를 하나도 못 찾았습니다.")
-            print("   -> 경로 설정이 상위 폴더(예: AACommu)로 되어있는지, 혹은 절대 경로가 맞는지 확인해주세요.")
             return pd.DataFrame()
         
-        print(f"🎯 발견된 폴더 ({len(target_dirs)}개):")
-        for d in target_dirs[:3]: # 너무 많으면 3개만 출력
-            print(f"  - {d}")
-        if len(target_dirs) > 3: print("  ... (생략)")
+        print(f"🎯 발견된 폴더 ({len(target_dirs)}개)")
 
         # 2. JSON 파일 수집
         json_files = []
@@ -101,20 +57,23 @@ class AACDataProcessor:
             
         print(f"📂 총 {len(json_files)}개의 JSON 파일을 분석합니다.")
 
-        # 3. 파싱 (기존과 동일)
+        # 3. 데이터 파싱 (인코딩 utf-8-sig 적용)
         for json_path in tqdm(json_files, desc="JSON 파싱"):
             try:
-                with open(json_path, 'r', encoding='utf-8') as f:
+                # [중요] BOM 이슈 해결을 위해 utf-8-sig 사용
+                with open(json_path, 'r', encoding='utf-8-sig') as f:
                     data = json.load(f)
                 
                 if 'video' not in data: continue
                 interactions = data['video'].get('interactions', [])
                 for interaction in interactions:
+                    # 손님 말 (Target)
                     human_text = ""
                     if 'human_event' in interaction and 'utterances' in interaction['human_event']:
                         utts = interaction['human_event']['utterances']
                         if utts: human_text = utts[0].get('utterance_cap', '').strip()
                     
+                    # 직원 말 (Input)
                     robot_text = ""
                     if 'robot_response' in interaction:
                         resps = interaction['robot_response']
@@ -122,15 +81,13 @@ class AACDataProcessor:
                     
                     if human_text and robot_text:
                         pairs.append({"q": robot_text, "a": human_text})
-            except: continue
-                
-        print(f"✅ 총 {len(pairs)}개의 대화 쌍 추출 완료.")
-        return pd.DataFrame(pairs)
+            except Exception as e:
+                continue
                 
         print(f"✅ 총 {len(pairs)}개의 대화 쌍 추출 완료.")
         return pd.DataFrame(pairs)
 
-# --- 3. 데이터셋 클래스 (KoGPT2 포맷) ---
+# --- 3. 데이터셋 클래스 ---
 class KoGPT2Dataset(Dataset):
     def __init__(self, df, tokenizer, max_len):
         self.data = df
@@ -148,7 +105,7 @@ class KoGPT2Dataset(Dataset):
         q_text = row['q']
         a_text = row['a']
         
-        # 포맷: <usr>직원말<sys>손님말</s>
+        # GPT 포맷: <usr>질문<sys>답변</s>
         text = self.q_token + q_text + self.a_token + a_text + self.eos
         
         tokenized = self.tokenizer(
@@ -165,41 +122,45 @@ class KoGPT2Dataset(Dataset):
         
         return {'input_ids': input_ids, 'attention_mask': mask}
 
-# --- 4. 메인 실행 ---
+# --- 4. 메인 실행 함수 ---
 def main():
+    # 저장 경로
     save_path = "./aac_kogpt2_model"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
+    # 1. 모델 & 토크나이저 설정
     tokenizer = PreTrainedTokenizerFast.from_pretrained(MODEL_NAME,
         bos_token='</s>', eos_token='</s>', unk_token='<unk>',
         pad_token='<pad>', mask_token='<mask>')
     
+    # 화자 구분 토큰 추가
     tokenizer.add_special_tokens({'additional_special_tokens': ['<usr>', '<sys>']})
     
     model = GPT2LMHeadModel.from_pretrained(MODEL_NAME)
     model.resize_token_embeddings(len(tokenizer))
     model.to(device)
 
-    # 경로 설정 (AAC_model_BERT.py와 동일)
+    # 2. 데이터 로드 (확인된 경로 사용)
     data_dir = "/local_datasets/AACommu/Training/02.라벨링데이터" 
     
     if not os.path.exists(data_dir):
-        print(f"❌ 경로를 찾을 수 없습니다: {data_dir}")
+        print(f"❌ 경로 오류: {data_dir} 를 찾을 수 없습니다.")
         return
 
     processor = AACDataProcessor(data_dir)
     df = processor.load_data()
 
     if len(df) == 0:
-        print("❌ 학습할 데이터가 없습니다.")
+        print("❌ 학습 데이터가 없습니다.")
         return
 
     dataset = KoGPT2Dataset(df, tokenizer, MAX_LEN)
     loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
 
-    print("\n🚀 KoGPT2 학습 시작 (식당/카페 전용)...")
+    # 3. 학습 루프
+    print("\n🚀 KoGPT2 학습 시작...")
     model.train()
     
     for epoch in range(EPOCHS):
@@ -210,6 +171,7 @@ def main():
             inputs = batch['input_ids'].to(device)
             mask = batch['attention_mask'].to(device)
             
+            # GPT는 입력을 그대로 라벨로 사용 (Shift는 모델 내부에서 처리됨)
             outputs = model(input_ids=inputs, attention_mask=mask, labels=inputs)
             loss = outputs.loss
             
@@ -222,9 +184,31 @@ def main():
         
         print(f"Epoch {epoch+1} Avg Loss: {total_loss / len(loader):.4f}")
 
+    # 4. 저장 및 테스트
     model.save_pretrained(save_path)
     tokenizer.save_pretrained(save_path)
     print(f"\n💾 모델 저장 완료: {save_path}")
+
+    # 간단 테스트
+    def generate_response(text):
+        model.eval()
+        input_text = f"<usr>{text}<sys>"
+        input_ids = tokenizer.encode(input_text, return_tensors='pt').to(device)
+        with torch.no_grad():
+            outputs = model.generate(
+                input_ids, 
+                max_length=50, 
+                repetition_penalty=2.0,
+                pad_token_id=tokenizer.pad_token_id,
+                eos_token_id=tokenizer.eos_token_id,
+                do_sample=True,
+                top_k=50
+            )
+        return tokenizer.decode(outputs[0], skip_special_tokens=False)
+
+    print("\n--- [TEST] ---")
+    print(f"Q: 어서오세요, 주문하시겠어요?")
+    print(f"A: {generate_response('어서오세요, 주문하시겠어요?')}")
 
 if __name__ == "__main__":
     main()

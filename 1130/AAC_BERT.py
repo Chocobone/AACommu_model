@@ -29,78 +29,12 @@ BATCH_SIZE = 32
 EPOCHS = 3
 LR = 2e-5
 
-# --- [수정됨] 데이터 로딩 관련 설정 (AAC_model_BERT.py 스타일) ---
-INPUT_DIR_NAMES = [
-    "TL_01.식당카페_01.입장_및_이용안내",
-    "TL_01.식당카페_02.자리안내",
-    "TL_01.식당카페_03.메뉴추천",
-    "TL_01.식당카페_04.메뉴주문",
-    "TL_01.식당카페_05.식음료서빙",
-    "TL_01.식당카페_06.결제_및_할인_포인트적립_안내",
-]
-
-def extract_dialogue_pairs_from_json(json_data):
-    """AAC_model_BERT.py의 로직을 차용"""
-    pairs = []
-    video_data = json_data.get('video')
-    if not video_data:
-        return pairs
-
-    interactions = video_data.get('interactions', [])
-    
-    for interaction in interactions:
-        human_utterances = interaction.get('human_event', {}).get('utterances', [])
-        robot_responses = interaction.get('robot_response', [])
-        
-        input_text = ""
-        if human_utterances:
-            input_text = human_utterances[0].get('utterance_cap', '').strip()
-
-        output_text = ""
-        if robot_responses:
-            output_text = robot_responses[0].get('answer', '').strip()
-        
-        if input_text and output_text:
-            pairs.append({
-                "q": input_text,     # 손님 (BERT 학습 시 text_b로 사용 예정) -> 문맥에 따라 순서 변경 가능
-                "a": output_text     # 점원 (BERT 학습 시 text_a로 사용 예정)
-            })
-            # 원래 AAC_BERT 로직: q=점원(질문), a=손님(답변)
-            # AAC_model_BERT 로직: input=손님, output=점원
-            # 여기서는 AAC_BERT의 기존 흐름(적절성 판단)에 맞춰 매핑합니다.
-            # 보통 문맥(q) -> 반응(a)의 적절성이므로:
-            # 점원 말(output_text) -> 손님 말(input_text)의 적절성인지, 
-            # 아니면 손님 말 -> 점원 말의 적절성인지 확인 필요.
-            # AAC_BERT 원본 코드 주석: "손님 말(정답/Human)", "직원 말(질문/Robot)"
-            # 즉, 직원이 물었을 때 손님이 대답하는 상황을 가정.
-            
-    # AAC_BERT 원본 흐름 유지:
-    # q: robot_response (직원)
-    # a: human_event (손님)
-    result_pairs = []
-    for interaction in interactions:
-        human_utterances = interaction.get('human_event', {}).get('utterances', [])
-        robot_responses = interaction.get('robot_response', [])
-        
-        h_txt = "" # 손님
-        if human_utterances: h_txt = human_utterances[0].get('utterance_cap', '').strip()
-        
-        r_txt = "" # 직원
-        if robot_responses: r_txt = robot_responses[0].get('answer', '').strip()
-        
-        if h_txt and r_txt:
-            result_pairs.append({'q': r_txt, 'a': h_txt})
-            
-    return result_pairs
-
-# --- 2. 데이터 처리 및 Negative Sampling ---
-# 기존 create_bert_dataset 함수를 이걸로 통째로 바꾸세요
+# --- 2. 데이터 처리 함수 ---
 def create_bert_dataset(data_dir):
     data_path = Path(data_dir)
     
+    # 1. 경로 탐색: 하위의 모든 TL_01 폴더 찾기
     print(f"🔍 '{data_path}' 경로 하위에서 'TL_01' 폴더를 찾는 중...")
-    
-    # [핵심 수정] rglob으로 깊이 상관없이 'TL_01' 폴더 찾기
     target_dirs = [
         p for p in data_path.rglob("*") 
         if p.is_dir() and p.name.startswith("TL_01")
@@ -112,6 +46,7 @@ def create_bert_dataset(data_dir):
 
     print(f"🎯 발견된 폴더 ({len(target_dirs)}개)")
 
+    # 2. JSON 파일 수집
     raw_pairs = []
     json_files = []
     for d in target_dirs:
@@ -119,9 +54,10 @@ def create_bert_dataset(data_dir):
         
     print(f"📂 총 {len(json_files)}개의 JSON 파일을 분석합니다.")
 
+    # 3. 데이터 추출 (인코딩 utf-8-sig 적용)
     for json_path in tqdm(json_files, desc="데이터 추출"):
         try:
-            with open(json_path, 'r', encoding='utf-8') as f:
+            with open(json_path, 'r', encoding='utf-8-sig') as f:
                 data = json.load(f)
             
             if 'video' not in data: continue
@@ -143,64 +79,35 @@ def create_bert_dataset(data_dir):
 
     if not raw_pairs: return pd.DataFrame()
 
-    # Negative Sampling 로직 (기존과 동일)
+    # 4. Negative Sampling (정답 1개 + 오답 1개)
     processed_data = []
     all_answers = [p['a'] for p in raw_pairs]
     
+    print("부정 샘플(Negative Sample) 생성 중...")
     for p in raw_pairs:
+        # Positive (정답) -> Label 1
         processed_data.append({'text_a': p['q'], 'text_b': p['a'], 'label': 1})
+        
+        # Negative (오답) -> Label 0
         while True:
             random_a = random.choice(all_answers)
             if random_a != p['a']: break
         processed_data.append({'text_a': p['q'], 'text_b': random_a, 'label': 0})
         
-    print(f"✅ 최종 데이터: {len(processed_data)}개")
+    print(f"✅ 최종 학습 데이터: {len(processed_data)}개")
     return pd.DataFrame(processed_data)
 
-    print(f"✅ 원본 대화 쌍 {len(raw_pairs)}개 추출 완료.")
-    if not raw_pairs: return pd.DataFrame()
-
-    # 3. Negative Sampling (정답 1개 + 오답 1개 생성)
-    # 이 부분은 AAC_BERT의 고유 로직(분류 모델용)이므로 유지
-    processed_data = []
-    all_answers = [p['a'] for p in raw_pairs] # 랜덤 추출용 전체 답변 리스트
-    
-    print("데이터셋 생성 (Positive + Negative) 진행 중...")
-    
-    for p in raw_pairs:
-        # (1) Positive Sample (Label 1) : 진짜 문맥
-        processed_data.append({
-            'text_a': p['q'], 
-            'text_b': p['a'], 
-            'label': 1
-        })
-        
-        # (2) Negative Sample (Label 0) : 가짜 문맥
-        while True:
-            random_a = random.choice(all_answers)
-            if random_a != p['a']:
-                break
-        
-        processed_data.append({
-            'text_a': p['q'], 
-            'text_b': random_a, 
-            'label': 0
-        })
-        
-    print(f"최종 학습 데이터 크기: {len(processed_data)} (Positive:Negative = 1:1)")
-    return pd.DataFrame(processed_data)
-
-# --- 3. BERT 모델 정의 ---
+# --- 3. BERT 모델 클래스 ---
 class BertClassifier(nn.Module):
     def __init__(self, model_name):
         super(BertClassifier, self).__init__()
         self.bert = BertModel.from_pretrained(model_name)
         self.drop = nn.Dropout(p=0.3)
-        self.out = nn.Linear(self.bert.config.hidden_size, 2) 
+        self.out = nn.Linear(self.bert.config.hidden_size, 2) # 0, 1
 
     def forward(self, input_ids, attention_mask):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        pooled_output = outputs.pooler_output 
+        pooled_output = outputs.pooler_output
         output = self.drop(pooled_output)
         return self.out(output)
 
@@ -235,9 +142,9 @@ class BertDataset(Dataset):
             'labels': torch.tensor(label, dtype=torch.long)
         }
 
-# --- 4. 메인 실행 ---
+# --- 4. 메인 실행 함수 ---
 def main():
-    # 데이터 경로 (AAC_model_BERT.py와 동일하게 설정)
+    # 데이터 경로
     data_dir = "/local_datasets/AACommu/Training/02.라벨링데이터"
     save_path = "./aac_bert_model.pt"
 
@@ -248,10 +155,10 @@ def main():
     # 1. 데이터 로드
     df = create_bert_dataset(data_dir)
     if df.empty:
-        print("❌ 학습할 데이터가 없습니다.")
+        print("❌ 학습 데이터가 없습니다.")
         return
 
-    # 2. 토크나이저 & 모델 준비
+    # 2. 모델 준비
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = BertClassifier(MODEL_NAME).to(device)
     
@@ -262,41 +169,51 @@ def main():
     loss_fn = nn.CrossEntropyLoss()
 
     # 3. 학습 루프
-    print("\n🚀 BERT 학습 시작 (적절성 평가 모델)...")
+    print("\n🚀 BERT 학습 시작...")
     model.train()
     
     for epoch in range(EPOCHS):
         total_loss = 0
-        correct_predictions = 0
-        
+        correct = 0
         progress_bar = tqdm(loader, desc=f"Epoch {epoch+1}/{EPOCHS}")
         
         for batch in progress_bar:
             input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
+            mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
             
-            outputs = model(input_ids, attention_mask)
-            
-            _, preds = torch.max(outputs, dim=1)
+            outputs = model(input_ids, mask)
             loss = loss_fn(outputs, labels)
-            
-            correct_predictions += torch.sum(preds == labels)
-            total_loss += loss.item()
             
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             
+            total_loss += loss.item()
+            preds = torch.argmax(outputs, dim=1)
+            correct += (preds == labels).sum().item()
+            
             progress_bar.set_postfix({'loss': loss.item()})
-        
-        avg_loss = total_loss / len(loader)
-        acc = correct_predictions.double() / len(df)
-        print(f"Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.4f}")
+            
+        print(f"Epoch {epoch+1} | Loss: {total_loss/len(loader):.4f} | Acc: {correct/len(df):.4f}")
 
-    # 4. 모델 저장
+    # 4. 저장
     torch.save(model.state_dict(), save_path)
     print(f"\n💾 모델 저장 완료: {save_path}")
+
+    # 간단 테스트
+    def predict_score(q, a):
+        model.eval()
+        text = q + " [SEP] " + a
+        inputs = tokenizer(text, return_tensors='pt', max_length=MAX_LEN, padding='max_length', truncation=True)
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+        with torch.no_grad():
+            outputs = model(inputs['input_ids'], inputs['attention_mask'])
+            probs = torch.nn.functional.softmax(outputs, dim=1)
+        return probs[0][1].item()
+
+    print("\n--- [TEST] ---")
+    print(f"Q: 드시고 가시나요? / A: 네 먹고 갈게요 -> 점수: {predict_score('드시고 가시나요?', '네 먹고 갈게요'):.4f}")
 
 if __name__ == "__main__":
     main()
