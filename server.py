@@ -6,10 +6,9 @@ from pydantic import BaseModel
 from typing import List
 
 # ==========================================
-# 1. AI 모델 로드 (서버 켤 때 한 번만 실행됨)
+# 1. AI 모델 로드
 # ==========================================
 print("모델을 로드 중입니다... 잠시만 기다려주세요.")
-# SKT의 KoGPT-2 모델 사용 (한국어 성능 우수)
 model_name = "skt/kogpt2-base-v2"
 tokenizer = PreTrainedTokenizerFast.from_pretrained(model_name,
   bos_token='</s>', eos_token='</s>', unk_token='<unk>',
@@ -18,74 +17,79 @@ model = GPT2LMHeadModel.from_pretrained(model_name)
 print("모델 로드 완료!")
 
 # ==========================================
-# 2. 추천 알고리즘 로직 (핵심)
+# 2. 추천 알고리즘 로직 수정 (Beam Search & Short Generation)
 # ==========================================
-def generate_next_chunks(category: str, context_question: str, current_answer: list) -> List[str]:
+def generate_next_chunks(category: str, context_question: str, current_answer_list: List[str]) -> List[str]:
     """
-    context_question: 상대방의 질문 (예: "점심 뭐 먹을래?")
-    current_answer: 내가 지금까지 입력한 답변 (예: "나는 오늘")
+    category: 장소/상황 (예: "카페")
+    context_question: 상대방의 질문 (예: "주문하시겠어요?")
+    current_answer_list: 사용자가 지금까지 선택한 청크들의 리스트 (예: ["아이스", "아메리카노"])
     """
     
-    # 모델에게 줄 프롬프트 구성 (질문과 답변을 이어붙임)
-    # Q와 A라는 태그를 붙여서 모델이 대화 상황임을 인지하게 유도
+    # 1. 리스트로 들어온 히스토리를 하나의 문장으로 합침
+    # (한국어 띄어쓰기 고려: 청크 사이에 공백 추가)
+    current_context_string = " ".join(current_answer_list)
+    
+    # 2. 프롬프트 구성 (KoGPT2가 이해하기 쉬운 구조로 변경)
+    # Q: 질문, C: 상황, A: 답변 시작 부분
     if context_question:
-        prompt = f"Q: {context_question}\n context: {category} A: {current_answer}"
+        prompt = f"Q:{context_question} C:{category} A:{current_context_string}"
     else:
-        prompt = f"A: {current_answer}"
+        prompt = f"C:{category} A:{current_context_string}"
+
+    # 답변이 비어있지 않다면 자연스러운 연결을 위해 공백을 추가할 수도 있음
+    if current_context_string and not prompt.endswith(" "):
+        prompt += " "
 
     input_ids = tokenizer.encode(prompt, return_tensors='pt')
 
-    # -------------------------------------------------
-    # 핵심 알고리즘: Top-k & Top-p Sampling
-    # 확률이 높은 단어 하나만 뽑는 게 아니라, 
-    # 그럴싸한 후보 여러 개를 다양하게 뽑아내는 기법입니다.
-    # -------------------------------------------------
+    # 3. 핵심 알고리즘: Beam Search (점수 기반 추천)
+    # 문장을 끝까지 만드는 게 아니라, '다음에 올 가장 확률 높은 단어'를 찾습니다.
     with torch.no_grad():
         outputs = model.generate(
             input_ids,
-            max_length=len(input_ids[0]) + 5,  # 현재 길이보다 5토큰(약 2~3어절) 더 예측
-            do_sample=True,      # 확률적 샘플링 사용 (매번 조금씩 다른 추천)
-            top_k=50,            # 확률 상위 50개 후보 중에서만 선택
-            top_p=0.95,          # 누적 확률 95% 내의 후보만 선택 (이상한 단어 제외)
-            temperature=0.8,     # 창의성 조절 (낮을수록 정확, 높을수록 창의적)
-            num_return_sequences=3, # 서로 다른 후보 3개를 생성해라
-            eos_token_id=tokenizer.eos_token_id,
-            repetition_penalty=2.0  # 했던 말 또 하지 않게 페널티 부여
+            max_new_tokens=3,    # 핵심: 3~4 토큰(단어 1~2개 분량)만 짧게 생성
+            num_beams=10,        # 10개의 후보 경로를 탐색 (Scoring)
+            num_return_sequences=3, # 점수가 가장 높은 상위 3개를 리턴
+            no_repeat_ngram_size=2, # 동일한 단어 반복 방지
+            early_stopping=True,
+            eos_token_id=tokenizer.eos_token_id
         )
 
     candidates = []
     for output in outputs:
-        # 모델이 생성한 전체 문장에서 프롬프트 부분을 제거하고 '새로 생성된 부분'만 추출
+        # 전체 문장에서 프롬프트(입력값)를 제외한 '새로 생성된 부분'만 추출
         decoded_text = tokenizer.decode(output, skip_special_tokens=True)
+        # prompt 길이만큼 잘라내기
         generated_part = decoded_text[len(prompt):].strip()
         
-        # 첫 번째 공백이나 문장 부호를 기준으로 '청크'를 자름
-        # 예: "김치찌개 먹고 싶어" -> "김치찌개"
-        chunks = generated_part.split()
-        if chunks:
-            # 첫 번째 덩어리만 추천 후보로 등록
-            first_chunk = chunks[0]
-            if first_chunk not in candidates: # 중복 제거
-                candidates.append(first_chunk)
+        # 생성된 텍스트가 비어있지 않다면 추가
+        # (짧게 생성했으므로 generated_part 자체가 하나의 청크가 될 가능성이 높음)
+        if generated_part:
+            # 혹시 여러 단어가 생성되었다면 첫 어절만 가져오기 or 전체 사용
+            # 여기서는 '청크' 개념이므로 짧은 구(Phrase) 전체를 사용
+            clean_chunk = generated_part.split('.')[0] # 문장 끝 점(.)이 나오면 제거
+            if clean_chunk not in candidates:
+                candidates.append(clean_chunk)
 
-    # 만약 모델이 아무것도 추천 못했다면 기본값 제공 (에러 방지)
+    # 중복 제거 후 3개가 안 될 경우를 대비해 빈 값 처리 혹은 기본값
     if not candidates:
-        return ["...", "음,", "저기"]
-
-    return candidates
+        return ["네", "아니요", "잠시만요"]
+        
+    # 최대 3개까지만 반환
+    return candidates[:3]
 
 # ==========================================
-# 3. 서버 API 정의 (FastAPI)
+# 3. 서버 API 정의
 # ==========================================
 app = FastAPI()
 
 class RequestData(BaseModel):
     category: str
-    stt_text: str  # 상대방 말
-    history:  list   # 내 현재 입력
+    stt_text: str 
+    history: List[str] # 사용자 입력 히스토리를 리스트로 받음
 
 @app.post("/predict")
 async def predict(data: RequestData):
-    # 위에서 만든 알고리즘 실행
     results = generate_next_chunks(data.category, data.stt_text, data.history)
     return {"recommendations": results}
