@@ -35,8 +35,12 @@ def create_bert_dataset(data_dir):
     
     # 1. TL_01 (식당/카페) 디렉토리만 필터링
     target_dirs = [
-        d for d in data_path.iterdir() 
-        if d.is_dir() and d.name.startswith("TL_01")
+        "TL_01.식당카페_01.입장_및_이용안내",
+        "TL_01.식당카페_02.자리안내",
+        "TL_01.식당카페_03.메뉴추천",
+        "TL_01.식당카페_04.메뉴주문",
+        "TL_01.식당카페_05.식음료서빙",
+        "TL_01.식당카페_06.결제_및_할인_포인트적립_안내",
     ]
     
     print(f"🎯 학습 대상 디렉토리 ({len(target_dirs)}개):")
