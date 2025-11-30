@@ -118,7 +118,7 @@ def main():
     model.to(device)
 
     # 2. 데이터 로드 (경로를 실제 데이터셋 경로로 수정하세요)
-    data_dir = "./Training/02.라벨링데이터"  # ⚠️ 실제 경로로 변경 필수
+    data_dir = "/local_datasets/AACommu/Training/02.라벨링데이터"  # ⚠️ 실제 경로로 변경 필수
     
     # 경로가 없으면 테스트용 더미 데이터 생성
     if not os.path.exists(data_dir):

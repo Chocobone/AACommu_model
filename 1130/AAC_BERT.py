@@ -102,7 +102,8 @@ def main():
     model = BertClassifier(MODEL_NAME).to(device)
     
     # 데이터 로드
-    df = create_bert_dataset("./Training/02.라벨링데이터") # 경로 수정 필수
+    data_dir = "/local_datasets/AACommu/Training/02.라벨링데이터"
+    df = create_bert_dataset(data_dir) # 경로 수정 필수
     if df.empty:
         print("데이터가 없습니다.")
         return
