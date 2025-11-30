@@ -253,7 +253,7 @@ def get_best_candidates(stt_question: str, current_history: List[str]) -> List[s
     print(f"BERT 채점 결과: {scored_candidates[:5]}") # 로그 확인용
 
     # 상위 3개 단어만 반환
-    final_result = [item[0] for item in scored_candidates[:3]]
+    final_result = [item[0] for item in scored_candidates[:5]]
     return final_result
 
 
