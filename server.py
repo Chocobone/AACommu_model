@@ -44,11 +44,11 @@ def generate_next_chunks(category: str, context_question: str, current_answer: l
 
         ### Input JSON Example:
         ```json
-        {
-        "category": {category},
-        "context_question": {context_question},
-        "current_answer": {current_answer}
-        }"""
+        {{
+        "category": "{category}",
+        "context_question": "{context_question}",
+        "current_answer": "{current_answer}"
+        }}"""
     else:
         prompt = f"A: {current_answer}"
 
