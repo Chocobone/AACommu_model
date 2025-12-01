@@ -15,7 +15,7 @@ print("시스템 초기화 중... (GPU 메모리 확보 필요)")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # --- (1) KoGPT2 로드 (생성 담당) ---
-GPT_MODEL_PATH = "./aac_kogpt2_model.pt"
+GPT_MODEL_PATH = "./aac_kogpt2_dir_tag_model.pt"
 TOKENIZER_PATH = "./aac_tokenizer"
 
 if os.path.exists(TOKENIZER_PATH):
@@ -69,7 +69,7 @@ bert_model.eval()
 
 # server.py의 get_best_candidates 함수를 이걸로 덮어쓰세요.
 
-def get_best_candidates(stt_question: str, current_history: List[str]) -> List[str]:
+def get_best_candidates(category: str, stt_question: str, current_history: List[str]) -> List[str]:
     # 1. 문맥 정리
     current_context = " ".join(current_history)
     
@@ -187,8 +187,6 @@ def get_best_candidates(stt_question: str, current_history: List[str]) -> List[s
                 final_result.append(d)
         else:
             break
-            
-    return final_result
 
     # 3. 후보군 1차 필터링 (특수문자 제거 등)
     raw_candidates = []
@@ -269,5 +267,5 @@ class RequestData(BaseModel):
 
 @app.post("/predict")
 async def predict(data: RequestData):
-    results = get_best_candidates(data.stt_text, data.history)
+    results = get_best_candidates(data.category, data.stt_text, data.history)
     return {"recommendations": results}
