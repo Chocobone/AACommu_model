@@ -1,8 +1,7 @@
-# server.py (데이터 수정 없이 성능 극대화 버전)
+# server.py
 import torch
 import re
 import os
-import random
 import numpy as np
 from transformers import PreTrainedTokenizerFast, GPT2LMHeadModel, AutoTokenizer, BertModel
 from fastapi import FastAPI
@@ -10,12 +9,39 @@ from pydantic import BaseModel
 from typing import List
 
 # ==========================================
-# 1. 모델 로드 (기존과 동일)
+# 1. 모델 로드 (GPT + BERT)
 # ==========================================
-print("🚀 AI 서버(Inference Boost Mode) 가동 중...")
+print("시스템 초기화 중... (GPU 메모리 확보 필요)")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# BERT 정의
+# --- (1) KoGPT2 로드 (생성 담당) ---
+GPT_MODEL_PATH = "./aac_kogpt2_dir_tag_model.pt"
+TOKENIZER_PATH = "./aac_tokenizer"
+
+if os.path.exists(TOKENIZER_PATH):
+    gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained(TOKENIZER_PATH)
+else:
+    # 토크나이저 폴더가 없으면 기본 로드 (성능 저하 주의)
+    gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
+        bos_token='</s>', eos_token='</s>', unk_token='<unk>',
+        pad_token='<pad>', mask_token='<mask>')
+
+gpt_model = GPT2LMHeadModel.from_pretrained("skt/kogpt2-base-v2")
+gpt_model.resize_token_embeddings(len(gpt_tokenizer))
+
+if os.path.exists(GPT_MODEL_PATH):
+    gpt_model.load_state_dict(torch.load(GPT_MODEL_PATH, map_location=device))
+    print("✅ GPT 모델 로드 완료")
+else:
+    print("⚠️ GPT 모델 파일이 없습니다. 기본 모델로 동작합니다.")
+
+gpt_model.to(device)
+gpt_model.eval()
+
+# --- (2) BERT 로드 (검증/채점 담당) ---
+BERT_MODEL_PATH = "./aac_bert_model.pt"
+bert_tokenizer = AutoTokenizer.from_pretrained("klue/bert-base")
+
 class BertClassifier(torch.nn.Module):
     def __init__(self):
         super(BertClassifier, self).__init__()
@@ -27,99 +53,62 @@ class BertClassifier(torch.nn.Module):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
         return self.out(self.drop(outputs.pooler_output))
 
-# 경로 설정
-GPT_MODEL_PATH = "./aac_kogpt2_model.pt"
-TOKENIZER_PATH = "./aac_tokenizer"
-BERT_MODEL_PATH = "./aac_bert_model.pt"
-
-# 로드 로직
-if os.path.exists(TOKENIZER_PATH):
-    gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained(TOKENIZER_PATH)
-else:
-    gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
-        bos_token='</s>', eos_token='</s>', unk_token='<unk>', pad_token='<pad>', mask_token='<mask>')
-
-gpt_model = GPT2LMHeadModel.from_pretrained("skt/kogpt2-base-v2")
-gpt_model.resize_token_embeddings(len(gpt_tokenizer))
-if os.path.exists(GPT_MODEL_PATH):
-    gpt_model.load_state_dict(torch.load(GPT_MODEL_PATH, map_location=device))
-gpt_model.to(device); gpt_model.eval()
-
-bert_tokenizer = AutoTokenizer.from_pretrained("klue/bert-base")
 bert_model = BertClassifier()
 if os.path.exists(BERT_MODEL_PATH):
     bert_model.load_state_dict(torch.load(BERT_MODEL_PATH, map_location=device))
-bert_model.to(device); bert_model.eval()
+    print("✅ BERT 모델 로드 완료")
+else:
+    print("⚠️ BERT 모델 파일이 없습니다. 검증 기능이 작동하지 않을 수 있습니다.")
+
+bert_model.to(device)
+bert_model.eval()
 
 # ==========================================
-# 2. [치트키] 정답 단어장 (Dictionary Injection)
+# 2. 로직: 생성(Generate) -> 검증(Rank)
 # ==========================================
-# 학습 데이터가 부족하니, 여기서 '지식'을 보충해줍니다.
-# AI가 이 단어를 뱉으면 점수를 확 올려주고, 못 뱉으면 강제로 넣어줍니다.
 
-PREFERRED_WORDS = {
-    "카페": [
-        "아메리카노", "라떼", "카페모카", "바닐라", "아이스티", "에이드", "스무디", 
-        "티", "주스", "케이크", "베이글", "마카롱", "샌드위치", "쿠키",
-        "얼음", "시럽", "휘핑", "샷", "사이즈", "테이크아웃", "매장", "진동벨", "쿠폰", "적립"
-    ],
-    "식당": [
-        "김치찌개", "된장찌개", "볶음밥", "덮밥", "돈까스", "우동", "라면", "김밥",
-        "반찬", "공기밥", "물", "김치", "단무지", "메뉴판", "주문", "계산", "포장",
-        "1인분", "2인분", "매운거", "안맵게", "앞치마"
-    ],
-    "편의점": [
-        "봉투", "영수증", "담배", "라이터", "교통카드", "충전", "도시락", "김밥",
-        "음료수", "물", "맥주", "소주", "과자", "라면", "행사", "1+1", "2+1"
-    ],
-    "공통": [
-        "네", "아니요", "좋아요", "싫어요", "감사합니다", "잠시만요", "얼마에요?", 
-        "주세요", "해주세요", "없어요", "있어요"
-    ]
-}
-
-BAD_STARTS = ["을", "를", "이", "가", "은", "는", "로", "에", "서", "고", "지", "만", "요", "도", "의", "면"]
-
-# ==========================================
-# 3. 추천 로직 (부스팅 + 필터링 + 주입)
-# ==========================================
+# server.py의 get_best_candidates 함수를 이걸로 덮어쓰세요.
 
 def get_best_candidates(category: str, stt_question: str, current_history: List[str]) -> List[str]:
+    # 1. 문맥 정리
     current_context = " ".join(current_history)
     
-    # 1. 프롬프트 생성
+    # 프롬프트 생성
     if current_context:
         prompt = f"<usr>{stt_question}<sys>{current_context}"
     else:
         prompt = f"<usr>{stt_question}<sys>"
 
+    # 입력 텐서 생성
     input_ids = gpt_tokenizer.encode(prompt, return_tensors='pt').to(device)
 
-    # 2. GPT 생성 (온도를 높여서 다양성 확보)
-    # temperature 1.0 = 완전 창의적 (실수도 많이 함) -> 우리가 필터링할 거니까 괜찮음
+    # 2. GPT 생성 (조금 더 길게, 다양하게 뽑기)
     with torch.no_grad():
         outputs = gpt_model.generate(
             input_ids,
-            max_new_tokens=8,
-            num_beams=15,             # 빔 개수를 늘려 후보를 많이 확보
-            num_return_sequences=15,
-            repetition_penalty=1.3,
-            do_sample=True,
-            temperature=1.0,          # [중요] 창의성 최대화 (복숭아 탈출용)
+            max_new_tokens=8,        # 단어 파편화를 막기 위해 길이를 조금 늘림
+            num_beams=15,            # 후보 탐색 폭 확대
+            num_return_sequences=15, 
+            repetition_penalty=3.0,  # 반복 억제 강화
+            do_sample=True,          
+            temperature=0.7,         
             top_k=50,
-            top_p=0.95,
             eos_token_id=gpt_tokenizer.eos_token_id,
             pad_token_id=gpt_tokenizer.pad_token_id
         )
 
-    # 3. 정답 단어장 로드
-    target_vocab = PREFERRED_WORDS.get(category, PREFERRED_WORDS["카페"]) + PREFERRED_WORDS["공통"]
-
-    # 4. 후보 수집 및 1차 필터링
-    candidates_pool = set() # 중복 방지용 Set
+    # 3. 1차 필터링 (불량 토큰 제거)
+    raw_candidates = []
     
+    # 조사를 걸러내기 위한 리스트 (이걸로 시작하면 버림)
+    bad_starts = ["을", "를", "이", "가", "은", "는", "로", "에", "서", "고", "지", "만", "요"]
+    # 한 글자라도 살려야 하는 단어들
+    valid_singles = ["네", "물", "컵", "약", "밥", "면", "국", "돈"]
+
     for output in outputs:
         decoded = gpt_tokenizer.decode(output, skip_special_tokens=False)
+        
+        # <sys> 뒤의 내용 추출
         if "<sys>" in decoded:
             generated = decoded.split("<sys>")[1]
             if current_context and current_context in generated:
@@ -127,49 +116,46 @@ def get_best_candidates(category: str, stt_question: str, current_history: List[
         else:
             generated = decoded
 
-        clean_pattern = r'[\[\]\{\}\(\)<>\"\'\`~;:,.!?]'
+        # 특수문자 및 태그 제거
+        clean_pattern = r'[\[\]\{\}\(\)<>\"\'\`~;:,.!?]' # 문장부호도 제거
         generated = generated.replace("</s>", "").replace("<pad>", "").strip()
         generated = re.sub(clean_pattern, '', generated).strip()
         
-        if not generated: continue
+        if not generated:
+            continue
+
+        # [핵심] 첫 어절만 가져오되, 파편화된 단어 거르기
         first_word = generated.split(' ')[0]
         
-        # 조사로 시작하는 쓰레기 데이터 제거
-        is_bad = False
-        for bad in BAD_STARTS:
-            if first_word.startswith(bad): is_bad = True; break
-        if is_bad: continue
+        # 규칙 1: 너무 짧은데 의미 없는 말 제거
+        if len(first_word) == 1 and first_word not in valid_singles:
+            continue
+            
+        # 규칙 2: 조사로 시작하는 말 제거 ('로 주세요' -> '로' 방지)
+        is_bad_start = False
+        for bad in bad_starts:
+            if first_word.startswith(bad):
+                is_bad_start = True
+                break
+        if is_bad_start:
+            continue
+            
+        # 규칙 3: 중복 제거 및 리스트 추가
+        if first_word and first_word not in raw_candidates:
+            raw_candidates.append(first_word)
 
-        # 너무 긴 단어(5글자 이상)는 노이즈일 확률 높음 (단, 메뉴명은 제외)
-        if len(first_word) > 5 and first_word not in target_vocab: continue
-        
-        candidates_pool.add(first_word)
-
-    # list로 변환
-    raw_candidates = list(candidates_pool)
-
-    # =========================================================
-    # [치트키 1] 강제 주입 (Injection)
-    # =========================================================
-    # GPT가 멍청해서 좋은 단어를 하나도 못 뱉었을 경우를 대비해
-    # DB에서 상황에 맞는 단어 5개를 랜덤으로 뽑아서 후보에 슬쩍 끼워넣습니다.
-    
-    # 문장이 짧을 때(초반)만 메뉴 주입
-    if len(current_history) < 2: 
-        injected = random.sample(target_vocab, k=min(5, len(target_vocab)))
-        for item in injected:
-            if item not in current_history: # 이미 말한거 제외
-                raw_candidates.append(item)
-
-    # =========================================================
-    # [치트키 2] BERT 채점 + 점수 조작 (Score Boosting)
-    # =========================================================
+    # 4. BERT 채점 (Re-ranking)
     scored_candidates = []
     
+    if not raw_candidates:
+        # 후보가 없으면 기본값 바로 리턴
+        return ["네", "아니요", "감사합니다"]
+
     with torch.no_grad():
         for cand in raw_candidates:
-            # 1. 기본 BERT 점수 계산
             full_answer = f"{current_context} {cand}".strip()
+            
+            # 질문 + (현재문맥 + 후보단어) 쌍으로 검증
             text = f"{stt_question} [SEP] {full_answer}"
             
             inputs = bert_tokenizer(
@@ -179,38 +165,98 @@ def get_best_candidates(category: str, stt_question: str, current_history: List[
             
             outputs = bert_model(inputs['input_ids'], inputs['attention_mask'])
             probs = torch.nn.functional.softmax(outputs, dim=1)
-            base_score = probs[0][1].item() 
+            score = probs[0][1].item() 
             
-            # 2. [점수 조작] 우리가 좋아하는 단어면 가산점 부여!
-            final_score = base_score
-            if cand in target_vocab:
-                final_score += 0.3  # 가산점 0.3점 (엄청 큰 점수)
-            
-            # 3. 커트라인 통과 여부 (가산점 덕분에 메뉴 이름은 쉽게 통과함)
-            # 이상한 단어("예약석으로")는 사전에 없으니 가산점 못 받고 탈락
-            if final_score >= 0.35: 
-                scored_candidates.append((cand, final_score))
+            # 규칙 4: BERT 점수가 0.4점 미만이면 과감히 버림 (로그에 0.02 같은거 제거)
+            if score >= 0.4:
+                scored_candidates.append((cand, score))
 
-    # 점수 순 정렬
+    # 5. 최종 정렬 및 반환
     scored_candidates.sort(key=lambda x: x[1], reverse=True)
     
-    print(f"🔹 [{category}] Q: {stt_question} -> Top: {scored_candidates[:5]}")
+    print(f"BERT 최종 후보(Score 0.4↑): {scored_candidates[:5]}") # 로그 확인용
 
-    # 최종 3개 선정
+    # 규칙 5: 필터링을 다 거쳤는데 남은게 3개 미만이다? -> 안전장치(Safety Net) 발동
     final_result = [item[0] for item in scored_candidates[:3]]
     
-    # 안전장치 (결과 부족 시 채우기)
+    # 부족하면 기본 단어로 채움
     defaults = ["네", "아니요", "감사합니다", "잠시만요"]
     for d in defaults:
         if len(final_result) < 3:
-            if d not in final_result: final_result.append(d)
-        else: break
+            if d not in final_result:
+                final_result.append(d)
+        else:
+            break
+
+    # 3. 후보군 1차 필터링 (특수문자 제거 등)
+    raw_candidates = []
+    clean_pattern = r'[\[\]\{\}\(\)<>\"\'\`~;:]' # 점(.)은 살려둠(문장 끝 판단용)
+
+    for output in outputs:
+        decoded = gpt_tokenizer.decode(output, skip_special_tokens=False)
+        if "<sys>" in decoded:
+            generated = decoded.split("<sys>")[1]
+            if current_context and current_context in generated:
+                generated = generated.replace(current_context, "", 1)
+        else:
+            generated = decoded
+
+        # 태그 및 특수문자 정리
+        generated = generated.replace("</s>", "").replace("<pad>", "").strip()
+        generated = re.sub(clean_pattern, '', generated).strip()
+        
+        # 첫 어절 추출 (단어 단위 추천)
+        if generated:
+            first_word = generated.split(' ')[0]
+            # 이미 선택한 단어거나, 너무 짧은 조사 등은 제외 가능
+            if first_word and first_word not in raw_candidates:
+                raw_candidates.append(first_word)
+
+    # 후보가 너무 적으면 기본값 추가
+    if len(raw_candidates) < 3:
+        raw_candidates.extend(["네", "아니요", "감사합니다"])
+    
+    # 중복 제거
+    raw_candidates = list(dict.fromkeys(raw_candidates))
+
+    # =========================================================
+    # 4. [핵심] BERT로 후보 채점 (Re-ranking)
+    # =========================================================
+    scored_candidates = []
+    
+    with torch.no_grad():
+        for cand in raw_candidates:
+            # BERT에게 물어봄: "질문(Q)에 대해, 기존문장+이단어(A)가 적절하니?"
+            # 예: Q="드시고 가시나요?", A="아 다행이다" -> BERT Score 낮음
+            # 예: Q="드시고 가시나요?", A="네" -> BERT Score 높음
             
+            full_answer = f"{current_context} {cand}".strip()
+            
+            # BERT 입력 포맷
+            text = f"{stt_question} [SEP] {full_answer}"
+            inputs = bert_tokenizer(
+                text, return_tensors='pt', truncation=True, max_length=128, padding='max_length'
+            )
+            inputs = {k: v.to(device) for k, v in inputs.items()}
+            
+            outputs = bert_model(inputs['input_ids'], inputs['attention_mask'])
+            probs = torch.nn.functional.softmax(outputs, dim=1)
+            score = probs[0][1].item() # '적절함(Label 1)'일 확률
+            
+            scored_candidates.append((cand, score))
+
+    # 5. 점수 높은 순으로 정렬
+    scored_candidates.sort(key=lambda x: x[1], reverse=True)
+    
+    print(f"BERT 채점 결과: {scored_candidates[:5]}") # 로그 확인용
+
+    # 상위 3개 단어만 반환
+    final_result = [item[0] for item in scored_candidates[:5]]
     return final_result
 
 
 # ==========================================
-# 4. API 실행
+# 3. API 서버
 # ==========================================
 app = FastAPI()
 
