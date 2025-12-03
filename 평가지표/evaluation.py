@@ -252,5 +252,5 @@ if __name__ == "__main__":
     # 필요한 평가만 주석 해제하여 실행하세요
     evaluate_top_k_hit_rate(k=3)     # 전략 1 (추천)
     evaluate_bert_accuracy()         # 전략 2 (추천 - 수치 높게 나옴)
-    # evaluate_ppl()                 # 전략 3 (학술적)
+    evaluate_ppl()                 # 전략 3 (학술적)
     evaluate_semantic_similarity()   # 전략 4 (의미적 일치)
