@@ -105,14 +105,14 @@ def get_best_candidates(category: str, stt_question: str, current_history: List[
     # 입력 텐서 생성
     input_ids = gpt_tokenizer.encode(prompt, return_tensors='pt').to(device)
 
-    # 2. GPT 생성 (조금 더 길게, 다양하게 뽑기)
+    # 2. GPT 생성
     with torch.no_grad():
         outputs = gpt_model.generate(
             input_ids,
-            max_new_tokens=8,        # 단어 파편화를 막기 위해 길이를 조금 늘림
-            num_beams=15,            # 후보 탐색 폭 확대
+            max_new_tokens=8,
+            num_beams=15,
             num_return_sequences=15, 
-            repetition_penalty=3.0,  # 반복 억제 강화
+            repetition_penalty=3.0,
             do_sample=True,          
             temperature=0.7,         
             top_k=50,
@@ -129,32 +129,38 @@ def get_best_candidates(category: str, stt_question: str, current_history: List[
     valid_singles = ["네", "물", "컵", "약", "밥", "면", "국", "돈"]
 
     for output in outputs:
-        decoded = gpt_tokenizer.decode(output, skip_special_tokens=False)
+        # [수정] output 텐서를 리스트로 변환하여 decode 에러 방지
+        decoded = gpt_tokenizer.decode(output.tolist(), skip_special_tokens=False)
         
         # <sys> 뒤의 내용 추출
         if "<sys>" in decoded:
-            generated = decoded.split("<sys>")[1]
+            try:
+                generated = decoded.split("<sys>")[1]
+            except IndexError:
+                generated = decoded
+            
+            # 문맥이 포함되어 있다면 제거
             if current_context and current_context in generated:
                 generated = generated.replace(current_context, "", 1)
         else:
             generated = decoded
 
         # 특수문자 및 태그 제거
-        clean_pattern = r'[\[\]\{\}\(\)<>\"\'\`~;:,.!?]' # 문장부호도 제거
+        clean_pattern = r'[\[\]\{\}\(\)<>\"\'\`~;:,.!?]' 
         generated = generated.replace("</s>", "").replace("<pad>", "").strip()
         generated = re.sub(clean_pattern, '', generated).strip()
         
         if not generated:
             continue
 
-        # [핵심] 첫 어절만 가져오되, 파편화된 단어 거르기
+        # 첫 어절만 추출
         first_word = generated.split(' ')[0]
         
         # 규칙 1: 너무 짧은데 의미 없는 말 제거
         if len(first_word) == 1 and first_word not in valid_singles:
             continue
             
-        # 규칙 2: 조사로 시작하는 말 제거 ('로 주세요' -> '로' 방지)
+        # 규칙 2: 조사로 시작하는 말 제거
         is_bad_start = False
         for bad in bad_starts:
             if first_word.startswith(bad):
@@ -170,8 +176,8 @@ def get_best_candidates(category: str, stt_question: str, current_history: List[
     # 4. BERT 채점 (Re-ranking)
     scored_candidates = []
     
+    # 후보가 아예 없으면 기본값 리턴
     if not raw_candidates:
-        # 후보가 없으면 기본값 바로 리턴
         return ["네", "아니요", "감사합니다"]
 
     with torch.no_grad():
@@ -190,19 +196,19 @@ def get_best_candidates(category: str, stt_question: str, current_history: List[
             probs = torch.nn.functional.softmax(outputs, dim=1)
             score = probs[0][1].item() 
             
-            # 규칙 4: BERT 점수가 0.4점 미만이면 과감히 버림 (로그에 0.02 같은거 제거)
+            # 규칙 4: BERT 점수가 0.4점 미만이면 과감히 버림
             if score >= 0.4:
                 scored_candidates.append((cand, score))
 
     # 5. 최종 정렬 및 반환
     scored_candidates.sort(key=lambda x: x[1], reverse=True)
     
-    print(f"BERT 최종 후보(Score 0.4↑): {scored_candidates[:5]}") # 로그 확인용
+    print(f"BERT 최종 후보(Score 0.4↑): {scored_candidates[:5]}") 
 
-    # 규칙 5: 필터링을 다 거쳤는데 남은게 3개 미만이다? -> 안전장치(Safety Net) 발동
+    # 상위 3개 추출
     final_result = [item[0] for item in scored_candidates[:3]]
     
-    # 부족하면 기본 단어로 채움
+    # 규칙 5: 결과가 3개 미만이면 기본 단어로 채움 (안전장치)
     defaults = ["네", "아니요", "감사합니다", "잠시만요"]
     for d in defaults:
         if len(final_result) < 3:
@@ -211,70 +217,6 @@ def get_best_candidates(category: str, stt_question: str, current_history: List[
         else:
             break
 
-    # 3. 후보군 1차 필터링 (특수문자 제거 등)
-    raw_candidates = []
-    clean_pattern = r'[\[\]\{\}\(\)<>\"\'\`~;:]' # 점(.)은 살려둠(문장 끝 판단용)
-
-    for output in outputs:
-        decoded = gpt_tokenizer.decode(output, skip_special_tokens=False)
-        if "<sys>" in decoded:
-            generated = decoded.split("<sys>")[1]
-            if current_context and current_context in generated:
-                generated = generated.replace(current_context, "", 1)
-        else:
-            generated = decoded
-
-        # 태그 및 특수문자 정리
-        generated = generated.replace("</s>", "").replace("<pad>", "").strip()
-        generated = re.sub(clean_pattern, '', generated).strip()
-        
-        # 첫 어절 추출 (단어 단위 추천)
-        if generated:
-            first_word = generated.split(' ')[0]
-            # 이미 선택한 단어거나, 너무 짧은 조사 등은 제외 가능
-            if first_word and first_word not in raw_candidates:
-                raw_candidates.append(first_word)
-
-    # 후보가 너무 적으면 기본값 추가
-    if len(raw_candidates) < 3:
-        raw_candidates.extend(["네", "아니요", "감사합니다"])
-    
-    # 중복 제거
-    raw_candidates = list(dict.fromkeys(raw_candidates))
-
-    # =========================================================
-    # 4. [핵심] BERT로 후보 채점 (Re-ranking)
-    # =========================================================
-    scored_candidates = []
-    
-    with torch.no_grad():
-        for cand in raw_candidates:
-            # BERT에게 물어봄: "질문(Q)에 대해, 기존문장+이단어(A)가 적절하니?"
-            # 예: Q="드시고 가시나요?", A="아 다행이다" -> BERT Score 낮음
-            # 예: Q="드시고 가시나요?", A="네" -> BERT Score 높음
-            
-            full_answer = f"{current_context} {cand}".strip()
-            
-            # BERT 입력 포맷
-            text = f"{stt_question} [SEP] {full_answer}"
-            inputs = bert_tokenizer(
-                text, return_tensors='pt', truncation=True, max_length=128, padding='max_length'
-            )
-            inputs = {k: v.to(device) for k, v in inputs.items()}
-            
-            outputs = bert_model(inputs['input_ids'], inputs['attention_mask'])
-            probs = torch.nn.functional.softmax(outputs, dim=1)
-            score = probs[0][1].item() # '적절함(Label 1)'일 확률
-            
-            scored_candidates.append((cand, score))
-
-    # 5. 점수 높은 순으로 정렬
-    scored_candidates.sort(key=lambda x: x[1], reverse=True)
-    
-    print(f"BERT 채점 결과: {scored_candidates[:5]}") # 로그 확인용
-
-    # 상위 3개 단어만 반환
-    final_result = [item[0] for item in scored_candidates[:5]]
     return final_result
 
 
