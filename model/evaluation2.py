@@ -15,9 +15,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"DEVICE: {device}")
 
 # 파일 경로 (학습 코드에서 지정한 경로와 일치해야 함)
-GPT_MODEL_PATH = "./aac_kogpt2_dir_tag_model.pt"
-TOKENIZER_PATH = "./aac_dir_tag_tokenizer" 
-BERT_MODEL_PATH = "./aac_bert_model.pt"
+GPT_MODEL_PATH = "./AAC_KoGPT2_best.pt"
+TOKENIZER_PATH = "./aac_tokenizer" 
+BERT_MODEL_PATH = "./AACommu_model_best.pt"
 
 # ==========================================
 # 2. 클래스 정의 (AAC_BERT.py와 100% 일치시킴)
