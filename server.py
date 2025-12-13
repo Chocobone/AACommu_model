@@ -18,20 +18,43 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 GPT_MODEL_PATH = "./aac_kogpt2_dir_tag_model.pt"
 TOKENIZER_PATH = "./aac_tokenizer"
 
+# 1. 토크나이저 로드 및 보정
 if os.path.exists(TOKENIZER_PATH):
     gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained(TOKENIZER_PATH)
 else:
-    # 토크나이저 폴더가 없으면 기본 로드 (성능 저하 주의)
+    # 토크나이저 폴더가 없으면 기본 모델 로드
+    print("⚠️ 저장된 토크나이저가 없어 기본 모델을 로드합니다.")
     gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
         bos_token='</s>', eos_token='</s>', unk_token='<unk>',
         pad_token='<pad>', mask_token='<mask>')
+    
+    # [핵심 수정] 저장된 모델(51202)과 크기를 맞추기 위해 특수 토큰 강제 추가
+    # 차이 나는 2개는 보통 <usr>, <sys> 입니다.
+    special_tokens = ['<usr>', '<sys>']
+    gpt_tokenizer.add_tokens(special_tokens)
+    print(f"   👉 특수 토큰 추가됨: {special_tokens} (Size: {len(gpt_tokenizer)})")
 
+# 2. 모델 로드 및 리사이징
 gpt_model = GPT2LMHeadModel.from_pretrained("skt/kogpt2-base-v2")
+
+# 토크나이저 크기(51202 예상)에 맞춰 모델 임베딩 늘리기
 gpt_model.resize_token_embeddings(len(gpt_tokenizer))
 
+# 3. 가중치 적용 (안전 장치 포함)
 if os.path.exists(GPT_MODEL_PATH):
-    gpt_model.load_state_dict(torch.load(GPT_MODEL_PATH, map_location=device))
-    print("✅ GPT 모델 로드 완료")
+    try:
+        # weights_only=False는 파이토치 버전 호환성을 위해 추가될 수 있음
+        state_dict = torch.load(GPT_MODEL_PATH, map_location=device)
+        gpt_model.load_state_dict(state_dict)
+        print("✅ GPT 모델 로드 완료")
+    except RuntimeError as e:
+        # 만약 그래도 크기가 안 맞으면, 모델 파일의 크기에 맞춰 강제 리사이징 시도
+        print(f"⚠️ 모델 크기 불일치 감지! 강제 조정 시도... ({e})")
+        # 에러 메시지에서 타겟 사이즈 추출 (예: 51202)
+        # 임시로 51202로 맞추고 재시도
+        gpt_model.resize_token_embeddings(51202) 
+        gpt_model.load_state_dict(torch.load(GPT_MODEL_PATH, map_location=device))
+        print("✅ GPT 모델 강제 로드 성공 (주의: 토크나이저와 매핑이 어긋날 수 있음)")
 else:
     print("⚠️ GPT 모델 파일이 없습니다. 기본 모델로 동작합니다.")
 
