@@ -13,9 +13,9 @@ import re
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 파일 경로 (사용자 환경에 맞게 수정)
-GPT_MODEL_PATH = "./aac_kogpt2_dir_tag_model.pt"
+GPT_MODEL_PATH = "./AAC_KoGPT2_best.pt"
 TOKENIZER_PATH = "./aac_tokenizer"
-BERT_MODEL_PATH = "./aac_bert_model.pt"
+BERT_MODEL_PATH = "./AACommu_model_best.pt"
 
 # 테스트용 데이터 (실제 평가 시 더 많이 추가하세요)
 TEST_DATA = [
