@@ -23,8 +23,8 @@ BERT_MODEL_PATH = "./AACommu_model_best.pt"
 TEST_DATA_PATH = "/local_datasets/AACommu/Validation/02.라벨링데이터"
 
 DIR_CATEGORY_MAP = {
-    "TL_01": "카페",
-    # "TL_02": "식당",
+    "VL_01": "카페",
+    # "VL_02": "식당",
 }
 
 # [수정 1] 데이터 로드 후 DataFrame -> List[Dict] 변환
