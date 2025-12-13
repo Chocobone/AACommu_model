@@ -36,7 +36,7 @@ LR = 3e-5
 
 # --- 2. 데이터 처리 클래스 ---
 class AACDataProcessor:
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, DIR_CATEGORY_MAP):
         self.data_dir = Path(data_dir)
         self.dir_map = DIR_CATEGORY_MAP
         
@@ -168,7 +168,7 @@ def main():
         print("❌ 경로 오류")
         return
 
-    processor = AACDataProcessor(data_dir)
+    processor = AACDataProcessor(data_dir, DIR_CATEGORY_MAP)
     df = processor.load_data()
 
     if len(df) == 0:

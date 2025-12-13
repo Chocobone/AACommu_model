@@ -10,6 +10,7 @@ from tqdm import tqdm
 import numpy as np
 import random
 import re
+from tools import AACDataProcessor
 
 # --- [설정] ---
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -17,13 +18,23 @@ GPT_MODEL_PATH = "./aac_kogpt2_dir_tag_model.pt"
 BERT_MODEL_PATH = "./aac_bert_model.pt"
 TOKENIZER_PATH = "./aac_dir_tag_tokenizer" # 토크나이저 저장 경로
 # 테스트용 가상의 정답 데이터셋 (실제로는 load_data 등을 통해 파일에서 불러오세요)
-TEST_DATA = [
-    {"place": "카페", "q": "주문하시겠어요?", "a": "아이스 아메리카노 주세요"},
-    {"place": "카페", "q": "드시고 가시나요?", "a": "네 먹고 갈게요"},
-    {"place": "카페", "q": "할인 카드 있으세요?", "a": "아니요 없어요"},
-    {"place": "카페", "q": "영수증 드릴까요?", "a": "네 주세요"},
-    {"place": "카페", "q": "진동벨로 알려드릴게요", "a": "감사합니다"}
-]
+# TEST_DATA = [
+#     {"place": "카페", "q": "주문하시겠어요?", "a": "아이스 아메리카노 주세요"},
+#     {"place": "카페", "q": "드시고 가시나요?", "a": "네 먹고 갈게요"},
+#     {"place": "카페", "q": "할인 카드 있으세요?", "a": "아니요 없어요"},
+#     {"place": "카페", "q": "영수증 드릴까요?", "a": "네 주세요"},
+#     {"place": "카페", "q": "진동벨로 알려드릴게요", "a": "감사합니다"}
+# ]
+DIR_CATEGORY_MAP = {
+    "TL_01": "카페",   # TL_01... 폴더 안에 있는 건 무조건 <LOC_카페>
+    # "TL_02": "식당", # (예시) 나중에 추가 가능
+    # "TL_03": "편의점"
+}
+
+TEST_DATA_PATH = "/local_datasets/AACommu/Validation/02.라벨링데이터"
+
+processor = AACDataProcessor(TEST_DATA_PATH, DIR_CATEGORY_MAP)
+TEST_DATA = processor.load_data()
 
 # ====================================================
 # 1. 전략: Top-K Hit Rate (생성 모델 추천 적중률)
