@@ -22,6 +22,12 @@ BERT_MODEL_PATH = "./AACommu_model_best.pt"
 
 TEST_DATA_PATH = "/local_datasets/AACommu/Validation/02.라벨링데이터"
 
+DIR_CATEGORY_MAP = {
+    "TL_01": "카페",   # TL_01... 폴더 안에 있는 건 무조건 <LOC_카페>
+    # "TL_02": "식당", # (예시) 나중에 추가 가능
+    # "TL_03": "편의점"
+}
+
 processor = AACDataProcessor(TEST_DATA_PATH, DIR_CATEGORY_MAP)
 TEST_DATA = processor.load_data()
 
