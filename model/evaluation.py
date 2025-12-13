@@ -26,9 +26,9 @@ TOKENIZER_PATH = "./aac_dir_tag_tokenizer" # 토크나이저 저장 경로
 #     {"place": "카페", "q": "진동벨로 알려드릴게요", "a": "감사합니다"}
 # ]
 DIR_CATEGORY_MAP = {
-    "TL_01": "카페",   # TL_01... 폴더 안에 있는 건 무조건 <LOC_카페>
-    # "TL_02": "식당", # (예시) 나중에 추가 가능
-    # "TL_03": "편의점"
+    "VL_01": "카페",   # TL_01... 폴더 안에 있는 건 무조건 <LOC_카페>
+    # "VL_02": "식당", # (예시) 나중에 추가 가능
+    # "VL_03": "편의점"
 }
 
 TEST_DATA_PATH = "/local_datasets/AACommu/Validation/02.라벨링데이터"
