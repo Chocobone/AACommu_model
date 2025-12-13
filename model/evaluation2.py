@@ -58,38 +58,52 @@ class BertClassifier(nn.Module):
 # ==========================================
 # 3. 모델 로드 함수 (수정됨)
 # ==========================================
+# evaluation2.py 내부의 load_models 함수를 이것으로 교체하세요
+
 def load_models():
     print("\n🔄 모델 로딩 중...")
     
     # --- (1) GPT 로드 ---
-    # [수정 2] 토크나이저 로드 실패 시, 강제로 특수 토큰 추가하여 사이즈 맞춤
+    # 1. 토크나이저 로드 (폴더가 없으면 기본 모델 사용)
     if os.path.exists(TOKENIZER_PATH):
         gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained(TOKENIZER_PATH)
     else:
-        print("⚠️ 저장된 토크나이저 폴더가 없습니다. 기본 모델에 특수 토큰을 추가합니다.")
+        print("⚠️ 저장된 토크나이저 폴더가 없습니다. 기본 모델을 기반으로 복구합니다.")
+        # 학습 코드와 동일하게 설정 (<pad>가 추가되면서 51200 -> 51201이 되었을 가능성이 높음)
         gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
             bos_token='</s>', eos_token='</s>', unk_token='<unk>',
             pad_token='<pad>', mask_token='<mask>')
         
-        # 학습 때 사용한 특수 토큰 강제 추가 (이 부분이 없으면 size mismatch 발생)
-        # DIR_CATEGORY_MAP에 있는 장소들을 토큰으로 추가
+        # 장소 태그 추가 (학습 코드와 동일하게)
         special_tokens = [f"<LOC_{loc}>" for loc in DIR_CATEGORY_MAP.values()]
+        # <LOC_기타>가 학습에 쓰였을 수 있으므로 추가
+        if "<LOC_기타>" not in special_tokens:
+            special_tokens.append("<LOC_기타>")
+            
         gpt_tokenizer.add_tokens(special_tokens)
-        print(f"   👉 특수 토큰 추가됨: {special_tokens}")
 
+    # 2. 모델 로드
     gpt_model = GPT2LMHeadModel.from_pretrained("skt/kogpt2-base-v2")
     
-    # [핵심] 토크나이저 길이에 맞춰 임베딩 리사이징 (51200 -> 51201 등)
-    gpt_model.resize_token_embeddings(len(gpt_tokenizer))
+    # [핵심 수정] 저장된 모델의 크기(51201)에 맞춰 강제 리사이징
+    # 현재 토크나이저 길이가 51201이 아니더라도, 가중치 로드를 위해 강제로 맞춥니다.
+    target_vocab_size = 51201 
     
+    if len(gpt_tokenizer) != target_vocab_size:
+        print(f"⚠️ 토크나이저 크기({len(gpt_tokenizer)})와 저장된 모델 크기({target_vocab_size})가 다릅니다.")
+        print(f"   👉 오류 방지를 위해 모델 임베딩을 {target_vocab_size}로 강제 조정합니다.")
+    
+    gpt_model.resize_token_embeddings(target_vocab_size)
+    
+    # 3. 가중치 불러오기
     if os.path.exists(GPT_MODEL_PATH):
         try:
-            # strict=False를 주면 미세한 불일치는 무시하지만, shape mismatch는 해결해야 함
-            gpt_model.load_state_dict(torch.load(GPT_MODEL_PATH, map_location=device))
+            # weights_only=False 경고는 무시하거나 파이토치 버전에 따라 True로 설정
+            state_dict = torch.load(GPT_MODEL_PATH, map_location=device)
+            gpt_model.load_state_dict(state_dict)
             print("✅ GPT 모델 로드 성공")
         except RuntimeError as e:
             print(f"❌ GPT 모델 로드 실패: {e}")
-            print("💡 힌트: 학습할 때 사용한 tokenizer와 현재 tokenizer의 단어 수가 다를 수 있습니다.")
             return None, None, None, None
     else:
         print(f"❌ GPT 모델 파일이 없습니다: {GPT_MODEL_PATH}")
@@ -118,7 +132,6 @@ def load_models():
         bert_model.eval()
 
     return gpt_model, gpt_tokenizer, bert_model, bert_tokenizer
-
 # ==========================================
 # 4. 평가 실행
 # ==========================================
