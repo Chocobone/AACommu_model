@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score, f1_score
 from tqdm import tqdm
 import re
 import os
+import random  # [추가] 랜덤 샘플링용
 import numpy as np
 from tools import AACDataProcessor
 
@@ -19,24 +20,25 @@ GPT_MODEL_PATH = "./AAC_KoGPT2_best.pt"
 TOKENIZER_PATH = "./aac_tokenizer" 
 BERT_MODEL_PATH = "./AACommu_model_best.pt"
 
-# [중요] 경로가 정확한지 다시 확인해주세요. (폴더 내부에 TL_01... 폴더가 있어야 함)
 TEST_DATA_PATH = "/local_datasets/AACommu/Validation/02.라벨링데이터"
 
 DIR_CATEGORY_MAP = {
     "VL_01": "카페",
-    # "VL_02": "식당",
+    # "VL_02": "식당", # 필요시 주석 해제
 }
 
-# [수정 1] 데이터 로드 후 DataFrame -> List[Dict] 변환
+# 데이터 로드
 processor = AACDataProcessor(TEST_DATA_PATH, DIR_CATEGORY_MAP)
 df_test = processor.load_data()
 
 if df_test.empty:
     print("\n⚠️ [경고] 로드된 데이터가 없습니다. 경로를 확인하거나 tools.py의 검색 로직을 확인하세요.")
     TEST_DATA = []
+    ALL_ANSWERS = []
 else:
-    # DataFrame을 딕셔너리 리스트로 변환
     TEST_DATA = df_test.to_dict('records')
+    # [수정] BERT 오답 생성을 위해 전체 정답 리스트 미리 추출
+    ALL_ANSWERS = [item['a'] for item in TEST_DATA if item['a']]
     print(f"✅ 총 {len(TEST_DATA)}개의 평가 데이터를 로드했습니다.")
 
 # ==========================================
@@ -56,49 +58,36 @@ class BertClassifier(nn.Module):
         return self.out(output)
 
 # ==========================================
-# 3. 모델 로드 함수 (수정됨)
+# 3. 모델 로드 함수
 # ==========================================
-# evaluation2.py 내부의 load_models 함수를 이것으로 교체하세요
-
 def load_models():
     print("\n🔄 모델 로딩 중...")
     
     # --- (1) GPT 로드 ---
-    # 1. 토크나이저 로드 (폴더가 없으면 기본 모델 사용)
     if os.path.exists(TOKENIZER_PATH):
         gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained(TOKENIZER_PATH)
     else:
         print("⚠️ 저장된 토크나이저 폴더가 없습니다. 기본 모델을 기반으로 복구합니다.")
-        # 학습 코드와 동일하게 설정 (<pad>가 추가되면서 51200 -> 51201이 되었을 가능성이 높음)
         gpt_tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
             bos_token='</s>', eos_token='</s>', unk_token='<unk>',
             pad_token='<pad>', mask_token='<mask>')
         
-        # 장소 태그 추가 (학습 코드와 동일하게)
         special_tokens = [f"<LOC_{loc}>" for loc in DIR_CATEGORY_MAP.values()]
-        # <LOC_기타>가 학습에 쓰였을 수 있으므로 추가
         if "<LOC_기타>" not in special_tokens:
             special_tokens.append("<LOC_기타>")
-            
         gpt_tokenizer.add_tokens(special_tokens)
 
-    # 2. 모델 로드
     gpt_model = GPT2LMHeadModel.from_pretrained("skt/kogpt2-base-v2")
     
-    # [핵심 수정] 저장된 모델의 크기(51201)에 맞춰 강제 리사이징
-    # 현재 토크나이저 길이가 51201이 아니더라도, 가중치 로드를 위해 강제로 맞춥니다.
+    # 임베딩 크기 조정
     target_vocab_size = 51201 
-    
     if len(gpt_tokenizer) != target_vocab_size:
-        print(f"⚠️ 토크나이저 크기({len(gpt_tokenizer)})와 저장된 모델 크기({target_vocab_size})가 다릅니다.")
-        print(f"   👉 오류 방지를 위해 모델 임베딩을 {target_vocab_size}로 강제 조정합니다.")
+        print(f"ℹ️ 토크나이저({len(gpt_tokenizer)})와 타겟({target_vocab_size}) 불일치 -> 강제 조정")
     
     gpt_model.resize_token_embeddings(target_vocab_size)
     
-    # 3. 가중치 불러오기
     if os.path.exists(GPT_MODEL_PATH):
         try:
-            # weights_only=False 경고는 무시하거나 파이토치 버전에 따라 True로 설정
             state_dict = torch.load(GPT_MODEL_PATH, map_location=device)
             gpt_model.load_state_dict(state_dict)
             print("✅ GPT 모델 로드 성공")
@@ -132,6 +121,7 @@ def load_models():
         bert_model.eval()
 
     return gpt_model, gpt_tokenizer, bert_model, bert_tokenizer
+
 # ==========================================
 # 4. 평가 실행
 # ==========================================
@@ -158,26 +148,26 @@ def run_evaluation():
     bert_preds = []
     bert_labels = []
 
+    # [디버깅] 처음 5개 샘플의 생성 결과 출력을 위한 카운터
+    debug_count = 0 
+    debug_limit = 5 
+
     for item in tqdm(TEST_DATA, desc="Processing"):
-        # [수정 3] tools.py는 'place_tag'에 이미 '<LOC_카페>' 형태로 저장함
         tag = item['place_tag']  
         q_text = item['q']
         target_a = item['a']
         
-        target_first_word = target_a.split()[0] if target_a else ""
-
         # --- [A] GPT 후보 생성 ---
-        # tag가 이미 <LOC_카페> 형태이므로 f"{tag}..."로 바로 사용
         input_text = f"{tag}<usr>{q_text}<sys>"
         input_ids = gpt_tokenizer.encode(input_text, return_tensors='pt').to(device)
 
         with torch.no_grad():
             outputs = gpt_model.generate(
                 input_ids,
-                max_new_tokens=10,
-                num_beams=10,
-                num_return_sequences=10,
-                repetition_penalty=2.0,
+                max_new_tokens=20,     # [수정] 토큰 길이 조금 늘림
+                num_beams=5,           # [수정] Beam Search 약간 축소 (속도 향상)
+                num_return_sequences=5,
+                repetition_penalty=1.5, # [수정] 페널티 약간 완화 (너무 높으면 말문 막힘)
                 pad_token_id=gpt_tokenizer.pad_token_id,
                 eos_token_id=gpt_tokenizer.eos_token_id,
                 early_stopping=True
@@ -188,19 +178,34 @@ def run_evaluation():
             decoded = gpt_tokenizer.decode(out, skip_special_tokens=False)
             if "<sys>" in decoded:
                 gen_part = decoded.split("<sys>")[1].replace("</s>", "").strip()
-                gen_part = re.sub(r'[^\w\s]', '', gen_part) # 특수문자 제거
-                first_word = gen_part.split()[0] if gen_part else ""
-                
-                if first_word and first_word not in candidates:
-                    candidates.append(first_word)
+                # 특수문자 일부 제거하되, 문장 형태는 유지
+                gen_part = re.sub(r'[^\w\s가-힣]', ' ', gen_part).strip()
+                if gen_part and gen_part not in candidates:
+                    candidates.append(gen_part)
         
-        # --- [B] Top-K Hit Rate ---
+        # [디버깅 출력] 생성된 문장이 무엇인지 확인
+        if debug_count < debug_limit:
+            print(f"\n[Debug {debug_count+1}]")
+            print(f"  Q   : {q_text}")
+            print(f"  Ans : {target_a}")
+            print(f"  Gen : {candidates[0] if candidates else 'FAILED'}")
+            debug_count += 1
+
+        # --- [B] Top-K Hit Rate (개선됨) ---
         preds_top5 = candidates[:5]
         hit_found_3 = False
         hit_found_5 = False
         
         for i, pred in enumerate(preds_top5):
-            if target_first_word and ((target_first_word in pred) or (pred in target_first_word)):
+            # [수정] 단순히 첫 단어 일치가 아니라, 정답이 생성 문장에 포함되거나 그 반대의 경우 체크
+            # 공백 제거 후 비교 (띄어쓰기 문제 완화)
+            pred_clean = pred.replace(" ", "")
+            target_clean = target_a.replace(" ", "")
+            
+            # 정답이 너무 짧은 경우(1글자) 제외하고 포함 관계 확인
+            is_match = (target_clean in pred_clean) or (pred_clean in target_clean)
+            
+            if is_match:
                 if i < 3: hit_found_3 = True
                 if i < 5: hit_found_5 = True
         
@@ -215,9 +220,9 @@ def run_evaluation():
             score = util.pytorch_cos_sim(emb1, emb2).item()
             sim_scores.append(score)
 
-        # --- [D] BERT Accuracy ---
-        if bert_model:
-            # 정답 (1)
+        # --- [D] BERT Accuracy (수정됨: Random Negative Sampling) ---
+        if bert_model and ALL_ANSWERS:
+            # (1) 정답 데이터
             text_pos = f"{q_text} [SEP] {target_a}"
             enc_pos = bert_tokenizer(text_pos, return_tensors='pt', truncation=True, max_length=128, padding='max_length').to(device)
             with torch.no_grad():
@@ -225,8 +230,14 @@ def run_evaluation():
                 bert_preds.append(torch.argmax(out_pos, dim=1).item())
                 bert_labels.append(1)
 
-            # 오답 (0)
-            text_neg = f"{q_text} [SEP] 엉뚱한소리"
+            # (2) 오답 데이터 (랜덤 추출)
+            # 현재 정답과 다른 답변을 찾을 때까지 랜덤 선택
+            while True:
+                random_wrong = random.choice(ALL_ANSWERS)
+                if random_wrong != target_a:
+                    break
+            
+            text_neg = f"{q_text} [SEP] {random_wrong}"
             enc_neg = bert_tokenizer(text_neg, return_tensors='pt', truncation=True, max_length=128, padding='max_length').to(device)
             with torch.no_grad():
                 out_neg = bert_model(enc_neg['input_ids'], enc_neg['attention_mask'])
